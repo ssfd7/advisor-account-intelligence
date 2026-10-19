@@ -1,0 +1,768 @@
+@prefix aai:     <https://w3id.org/aai/ontology#> .
+@prefix owl:     <http://www.w3.org/2002/07/owl#> .
+@prefix rdf:     <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix rdfs:    <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix xsd:     <http://www.w3.org/2001/XMLSchema#> .
+@prefix dcterms: <http://purl.org/dc/terms/> .
+@prefix skos:    <http://www.w3.org/2004/02/skos/core#> .
+@prefix prov:    <http://www.w3.org/ns/prov#> .
+@prefix vann:    <http://purl.org/vocab/vann/> .
+
+#################################################################
+# Ontology header
+#################################################################
+
+<https://w3id.org/aai/ontology> a owl:Ontology ;
+    dcterms:title "Advisor Account Intelligence ontology"@en ;
+    dcterms:description "Structural semantic model of advisors, firms, platforms, product relationships, QBR interactions, experience, intent and team-owned follow-up work. Formal counterpart of aai-model.drawio."@en ;
+    dcterms:created "2026-10-19"^^xsd:date ;
+    dcterms:modified "2026-10-19"^^xsd:date ;
+    owl:versionInfo "0.1" ;
+    owl:versionIRI <https://w3id.org/aai/ontology/0.1> ;
+    vann:preferredNamespacePrefix "aai" ;
+    vann:preferredNamespaceUri "https://w3id.org/aai/ontology#" .
+
+#################################################################
+# Reused external terms (declared, not imported)
+#################################################################
+
+skos:Concept a owl:Class .
+skos:ConceptScheme a owl:Class .
+prov:Entity a owl:Class .
+skos:inScheme a owl:ObjectProperty .
+skos:definition a owl:AnnotationProperty .
+skos:prefLabel a owl:AnnotationProperty .
+dcterms:title a owl:AnnotationProperty .
+dcterms:description a owl:AnnotationProperty .
+dcterms:created a owl:AnnotationProperty .
+dcterms:modified a owl:AnnotationProperty .
+vann:preferredNamespacePrefix a owl:AnnotationProperty .
+vann:preferredNamespaceUri a owl:AnnotationProperty .
+
+aai:steward a owl:AnnotationProperty ;
+    rdfs:label "steward"@en ;
+    skos:definition "The team accountable for the meaning of a term and for approving changes to it."@en .
+
+aai:termStatus a owl:AnnotationProperty ;
+    rdfs:label "termStatus"@en ;
+    skos:definition "Where a term stands in its lifecycle: proposed, reviewed or released."@en .
+
+#################################################################
+# Classes
+#################################################################
+
+aai:Party a owl:Class ;
+    rdfs:label "Party"@en ;
+    skos:definition "A person or organization with which the platform has a business relationship, or which is the subject of a recorded fact."@en .
+
+aai:Advisor a owl:Class ;
+    rdfs:subClassOf aai:Party ;
+    rdfs:label "Advisor"@en ;
+    skos:definition "An investment professional whose career, affiliations and platform relationships are being understood; one stable identity across firms and platforms."@en .
+
+aai:Firm a owl:Class ;
+    rdfs:subClassOf aai:Party ;
+    rdfs:label "Firm"@en ;
+    skos:definition "An advisory business, such as a registered investment adviser, modeled separately from the people affiliated with it."@en .
+
+aai:Platform a owl:Class ;
+    rdfs:label "Platform"@en ;
+    skos:definition "A provider or service environment for custody, clearing, brokerage, advisory technology or investment services."@en .
+
+aai:Affiliation a owl:Class ;
+    rdfs:label "Affiliation"@en ;
+    skos:definition "A dated association between an advisor and a firm, such as employment or ownership."@en .
+
+aai:Qualification a owl:Class ;
+    rdfs:label "Qualification"@en ;
+    skos:definition "A recorded examination result or professional credential held by an advisor. It does not establish registration or eligibility."@en .
+
+aai:Registration a owl:Class ;
+    rdfs:label "Registration"@en ;
+    skos:definition "A dated regulatory registration of a party, such as a firm's adviser registration or a person's representative registration with a firm."@en .
+
+aai:PlatformRelationship a owl:Class ;
+    rdfs:label "Platform Relationship"@en ;
+    skos:definition "A party's dated relationship with a platform as a whole, independent of its relationships with individual products."@en .
+
+aai:ProductOffering a owl:Class ;
+    rdfs:label "Product Offering"@en ;
+    skos:definition "A specific investment product, managed investment service or platform service available through a platform, with version and effective dates."@en .
+
+aai:Capability a owl:Class ;
+    rdfs:label "Capability"@en ;
+    skos:definition "A documented feature or function of a product offering, as stated in an approved catalog version."@en .
+
+aai:Prerequisite a owl:Class ;
+    rdfs:label "Prerequisite"@en ;
+    skos:definition "A condition that must be verified before a product can be adopted or an action can proceed, such as a required integration."@en .
+
+aai:ProductRelationship a owl:Class ;
+    rdfs:label "Product Relationship"@en ;
+    skos:definition "A party's use or consideration of one product offering, tracked independently of its other product relationships."@en .
+
+aai:ProductStateRecord a owl:Class ;
+    rdfs:label "Product State Record"@en ;
+    skos:definition "A dated, sourced statement of the state of one product relationship, proposed or confirmed."@en .
+
+aai:ProductState a owl:Class ;
+    rdfs:subClassOf skos:Concept ;
+    rdfs:label "Product State"@en ;
+    skos:definition "A business label for the state of a product relationship: evaluating, using, expanding, paused, rejected or discontinued."@en .
+
+aai:Discrepancy a owl:Class ;
+    rdfs:label "Discrepancy"@en ;
+    skos:definition "A recorded disagreement between sources about the same fact, shown to users rather than resolved silently."@en .
+
+aai:AssetObservation a owl:Class ;
+    rdfs:label "Asset Observation"@en ;
+    skos:definition "A dated asset metric with explicit metric type, reporting entity, scope and methodology."@en .
+
+aai:MetricType a owl:Class ;
+    rdfs:subClassOf skos:Concept ;
+    rdfs:label "Metric Type"@en ;
+    skos:definition "A defined asset measure, such as regulatory AUM, reported AUM or AUA. Measures of different types are not added together."@en .
+
+aai:SourceRecord a owl:Class ;
+    rdfs:subClassOf prov:Entity ;
+    rdfs:label "Source Record"@en ;
+    skos:definition "An identified record in a source system or file, such as a profile export row, catalog entry, registry record or task record."@en .
+
+aai:Interaction a owl:Class ;
+    rdfs:label "Interaction"@en ;
+    skos:definition "A recorded exchange between the platform team and a party, preserved as a source."@en .
+
+aai:QBRInteraction a owl:Class ;
+    rdfs:subClassOf aai:Interaction ;
+    rdfs:label "QBR Interaction"@en ;
+    skos:definition "A quarterly business review covering product experience, use, alternatives, intent and commitments."@en .
+
+aai:EmailMessage a owl:Class ;
+    rdfs:subClassOf aai:Interaction ;
+    rdfs:label "Email Message"@en ;
+    skos:definition "An email or activity note, which may repeat statements from an earlier interaction."@en .
+
+aai:SourceSpan a owl:Class ;
+    rdfs:subClassOf prov:Entity ;
+    rdfs:label "Source Span"@en ;
+    skos:definition "An exact excerpt of an interaction that supports an extracted observation or intent."@en .
+
+aai:ExperienceObservation a owl:Class ;
+    rdfs:label "Experience Observation"@en ;
+    skos:definition "A reported or measured experience involving a product, with its speaker, affected group and evidence type."@en .
+
+aai:AffectedGroup a owl:Class ;
+    rdfs:subClassOf skos:Concept ;
+    rdfs:label "Affected Group"@en ;
+    skos:definition "Whose experience an observation describes: the advisor, the advisor's team or an investor group."@en .
+
+aai:Intent a owl:Class ;
+    rdfs:label "Intent"@en ;
+    skos:definition "A stated business intention toward a product offering, with desired outcome, reason or blocker, and date."@en .
+
+aai:IntentConcept a owl:Class ;
+    rdfs:subClassOf skos:Concept ;
+    rdfs:label "Intent Concept"@en ;
+    skos:definition "An approved label in the intent taxonomy, with a stable identifier and definition."@en .
+
+aai:TaxonomyVersion a owl:Class ;
+    rdfs:subClassOf skos:ConceptScheme ;
+    rdfs:label "Taxonomy Version"@en ;
+    skos:definition "A published version of the intent taxonomy."@en .
+
+aai:Commitment a owl:Class ;
+    rdfs:label "Commitment"@en ;
+    skos:definition "A promise made by the platform team during an interaction, such as arranging a specialist session."@en .
+
+aai:Action a owl:Class ;
+    rdfs:label "Action"@en ;
+    skos:definition "A proposed or approved follow-up business action with owner, due date, status and completion evidence."@en .
+
+aai:Rep a owl:Class ;
+    rdfs:label "Rep"@en ;
+    skos:definition "An internal platform team member, such as a relationship manager, specialist or team lead. Separate from external parties."@en .
+
+aai:Team a owl:Class ;
+    rdfs:label "Team"@en ;
+    skos:definition "An internal team accountable for interactions and actions."@en .
+
+aai:Assignment a owl:Class ;
+    rdfs:label "Assignment"@en ;
+    skos:definition "A dated assignment of a work item to a rep, effective once acknowledged."@en .
+
+aai:Coverage a owl:Class ;
+    rdfs:label "Coverage"@en ;
+    skos:definition "A dated arrangement in which one rep covers for another who is unavailable or has left."@en .
+
+aai:Advisor owl:disjointWith aai:Firm .
+aai:Rep owl:disjointWith aai:Party .
+
+#################################################################
+# Object properties (relationships on the diagram)
+#################################################################
+
+aai:ofAdvisor a owl:ObjectProperty , owl:FunctionalProperty ;
+    rdfs:label "ofAdvisor"@en ;
+    rdfs:domain aai:Affiliation ;
+    rdfs:range aai:Advisor ;
+    skos:definition "Links an affiliation to the advisor it concerns."@en .
+
+aai:withFirm a owl:ObjectProperty ;
+    rdfs:label "withFirm"@en ;
+    rdfs:domain [ a owl:Class ; owl:unionOf ( aai:Affiliation aai:Registration ) ] ;
+    rdfs:range aai:Firm ;
+    skos:definition "Links an affiliation or registration to the firm it is with."@en .
+
+aai:heldBy a owl:ObjectProperty , owl:FunctionalProperty ;
+    rdfs:label "heldBy"@en ;
+    rdfs:domain aai:Qualification ;
+    rdfs:range aai:Advisor ;
+    skos:definition "Links a qualification to the advisor who holds it."@en .
+
+aai:registers a owl:ObjectProperty ;
+    rdfs:label "registers"@en ;
+    rdfs:domain aai:Registration ;
+    rdfs:range aai:Party ;
+    skos:definition "Links a registration to the party it registers."@en .
+
+aai:ofParty a owl:ObjectProperty , owl:FunctionalProperty ;
+    rdfs:label "ofParty"@en ;
+    rdfs:domain aai:PlatformRelationship ;
+    rdfs:range aai:Party ;
+    skos:definition "Links a platform relationship to the party that holds it."@en .
+
+aai:withPlatform a owl:ObjectProperty , owl:FunctionalProperty ;
+    rdfs:label "withPlatform"@en ;
+    rdfs:domain aai:PlatformRelationship ;
+    rdfs:range aai:Platform ;
+    skos:definition "Links a platform relationship to the platform it is with."@en .
+
+aai:evidencedBy a owl:ObjectProperty ;
+    rdfs:label "evidencedBy"@en ;
+    rdfs:domain [ a owl:Class ; owl:unionOf ( aai:Action aai:Affiliation aai:AssetObservation aai:Capability aai:PlatformRelationship aai:Prerequisite aai:ProductStateRecord aai:Qualification aai:Registration ) ] ;
+    rdfs:range aai:SourceRecord ;
+    skos:definition "Links a record to a source record that supports it."@en .
+
+aai:offers a owl:ObjectProperty ;
+    rdfs:label "offers"@en ;
+    rdfs:domain aai:Platform ;
+    rdfs:range aai:ProductOffering ;
+    skos:definition "Links a platform to a product offering available through it."@en .
+
+aai:hasCapability a owl:ObjectProperty ;
+    rdfs:label "hasCapability"@en ;
+    rdfs:domain aai:ProductOffering ;
+    rdfs:range aai:Capability ;
+    skos:definition "Links a product offering to a capability documented for it."@en .
+
+aai:hasPrerequisite a owl:ObjectProperty ;
+    rdfs:label "hasPrerequisite"@en ;
+    rdfs:domain aai:ProductOffering ;
+    rdfs:range aai:Prerequisite ;
+    skos:definition "Links a product offering to a condition required before adoption."@en .
+
+aai:hasProductRelationship a owl:ObjectProperty ;
+    rdfs:label "hasProductRelationship"@en ;
+    rdfs:domain aai:Party ;
+    rdfs:range aai:ProductRelationship ;
+    skos:definition "Links a party to one of its product relationships."@en .
+
+aai:forProduct a owl:ObjectProperty , owl:FunctionalProperty ;
+    rdfs:label "forProduct"@en ;
+    rdfs:domain aai:ProductRelationship ;
+    rdfs:range aai:ProductOffering ;
+    skos:definition "Links a product relationship to the product offering it concerns."@en .
+
+aai:stateOf a owl:ObjectProperty , owl:FunctionalProperty ;
+    rdfs:label "stateOf"@en ;
+    rdfs:domain aai:ProductStateRecord ;
+    rdfs:range aai:ProductRelationship ;
+    skos:definition "Links a product state record to the product relationship whose state it records."@en .
+
+aai:hasState a owl:ObjectProperty , owl:FunctionalProperty ;
+    rdfs:label "hasState"@en ;
+    rdfs:domain aai:ProductStateRecord ;
+    rdfs:range aai:ProductState ;
+    skos:definition "Links a product state record to the state it records."@en .
+
+aai:supersedes a owl:ObjectProperty ;
+    rdfs:label "supersedes"@en ;
+    rdfs:domain [ a owl:Class ; owl:unionOf ( aai:Intent aai:ProductStateRecord ) ] ;
+    rdfs:range [ a owl:Class ; owl:unionOf ( aai:Intent aai:ProductStateRecord ) ] ;
+    skos:definition "Links a later record to the earlier record with the same subject and target that it replaces. The earlier record is retained."@en .
+
+aai:involves a owl:ObjectProperty ;
+    rdfs:label "involves"@en ;
+    rdfs:domain aai:Discrepancy ;
+    rdfs:range aai:ProductStateRecord ;
+    skos:definition "Links a discrepancy to a record taking part in the disagreement."@en .
+
+aai:measures a owl:ObjectProperty ;
+    rdfs:label "measures"@en ;
+    rdfs:domain aai:AssetObservation ;
+    rdfs:range [ a owl:Class ; owl:unionOf ( aai:Party aai:Platform aai:ProductOffering ) ] ;
+    skos:definition "Links an asset observation to the party, platform or product offering whose assets it measures, at its evidenced scope."@en .
+
+aai:reportedBy a owl:ObjectProperty ;
+    rdfs:label "reportedBy"@en ;
+    rdfs:domain [ a owl:Class ; owl:unionOf ( aai:AssetObservation aai:ExperienceObservation ) ] ;
+    rdfs:range aai:Party ;
+    skos:definition "Links an observation to the party that reported it."@en .
+
+aai:hasMetricType a owl:ObjectProperty , owl:FunctionalProperty ;
+    rdfs:label "hasMetricType"@en ;
+    rdfs:domain aai:AssetObservation ;
+    rdfs:range aai:MetricType ;
+    skos:definition "Links an asset observation to its defined measure."@en .
+
+aai:withParty a owl:ObjectProperty ;
+    rdfs:label "withParty"@en ;
+    rdfs:domain aai:Interaction ;
+    rdfs:range aai:Party ;
+    skos:definition "Links an interaction to the external party it was held with."@en .
+
+aai:partOf a owl:ObjectProperty , owl:FunctionalProperty ;
+    rdfs:label "partOf"@en ;
+    rdfs:domain aai:SourceSpan ;
+    rdfs:range aai:Interaction ;
+    skos:definition "Links a source span to the interaction it is excerpted from."@en .
+
+aai:quotes a owl:ObjectProperty ;
+    rdfs:label "quotes"@en ;
+    rdfs:domain aai:SourceSpan ;
+    rdfs:range aai:SourceSpan ;
+    skos:definition "Links a source span to an earlier span it repeats. A quotation is not independent confirmation."@en .
+
+aai:records a owl:ObjectProperty ;
+    rdfs:label "records"@en ;
+    rdfs:domain aai:Interaction ;
+    rdfs:range [ a owl:Class ; owl:unionOf ( aai:Commitment aai:ExperienceObservation ) ] ;
+    skos:definition "Links an interaction to an experience observation or commitment recorded in it."@en .
+
+aai:expresses a owl:ObjectProperty ;
+    rdfs:label "expresses"@en ;
+    rdfs:domain aai:Interaction ;
+    rdfs:range aai:Intent ;
+    skos:definition "Links an interaction to an intent stated in it."@en .
+
+aai:concerns a owl:ObjectProperty ;
+    rdfs:label "concerns"@en ;
+    rdfs:domain [ a owl:Class ; owl:unionOf ( aai:Action aai:ExperienceObservation ) ] ;
+    rdfs:range aai:ProductOffering ;
+    skos:definition "Links an experience observation or action to the product offering it concerns."@en .
+
+aai:affects a owl:ObjectProperty ;
+    rdfs:label "affects"@en ;
+    rdfs:domain aai:ExperienceObservation ;
+    rdfs:range aai:AffectedGroup ;
+    skos:definition "Links an experience observation to the group whose experience it describes."@en .
+
+aai:supportedBy a owl:ObjectProperty ;
+    rdfs:label "supportedBy"@en ;
+    rdfs:domain [ a owl:Class ; owl:unionOf ( aai:ExperienceObservation aai:Intent ) ] ;
+    rdfs:range aai:SourceSpan ;
+    skos:definition "Links an extracted observation or intent to the source span that supports it."@en .
+
+aai:expressedBy a owl:ObjectProperty ;
+    rdfs:label "expressedBy"@en ;
+    rdfs:domain aai:Intent ;
+    rdfs:range aai:Party ;
+    skos:definition "Links an intent to the party that stated it."@en .
+
+aai:targets a owl:ObjectProperty ;
+    rdfs:label "targets"@en ;
+    rdfs:domain aai:Intent ;
+    rdfs:range aai:ProductOffering ;
+    skos:definition "Links an intent to the product offering it is directed at."@en .
+
+aai:considersAlternative a owl:ObjectProperty ;
+    rdfs:label "considersAlternative"@en ;
+    rdfs:domain aai:Intent ;
+    rdfs:range aai:ProductOffering ;
+    skos:definition "Links an intent to a product offering discussed as an alternative. Does not imply equivalence."@en .
+
+aai:classifiedAs a owl:ObjectProperty , owl:FunctionalProperty ;
+    rdfs:label "classifiedAs"@en ;
+    rdfs:domain aai:Intent ;
+    rdfs:range aai:IntentConcept ;
+    skos:definition "Links an intent to the taxonomy concept assigned to it."@en .
+
+aai:inTaxonomy a owl:ObjectProperty , owl:FunctionalProperty ;
+    rdfs:label "inTaxonomy"@en ;
+    rdfs:domain aai:IntentConcept ;
+    rdfs:range aai:TaxonomyVersion ;
+    skos:definition "Links an intent concept to the taxonomy version that defines it."@en .
+
+aai:ownedByTeam a owl:ObjectProperty ;
+    rdfs:label "ownedByTeam"@en ;
+    rdfs:domain [ a owl:Class ; owl:unionOf ( aai:Action aai:Interaction ) ] ;
+    rdfs:range aai:Team ;
+    skos:definition "Links an interaction or action to the team accountable for it."@en .
+
+aai:authoredBy a owl:ObjectProperty , owl:FunctionalProperty ;
+    rdfs:label "authoredBy"@en ;
+    rdfs:domain aai:Interaction ;
+    rdfs:range aai:Rep ;
+    skos:definition "Links an interaction to the rep who recorded it."@en .
+
+aai:arisesFrom a owl:ObjectProperty , owl:FunctionalProperty ;
+    rdfs:label "arisesFrom"@en ;
+    rdfs:domain aai:Action ;
+    rdfs:range aai:Interaction ;
+    skos:definition "Links an action to the interaction it follows up."@en .
+
+aai:addresses a owl:ObjectProperty ;
+    rdfs:label "addresses"@en ;
+    rdfs:domain aai:Action ;
+    rdfs:range [ a owl:Class ; owl:unionOf ( aai:ExperienceObservation aai:Intent ) ] ;
+    skos:definition "Links an action to the experience observation or intent that motivates it."@en .
+
+aai:fulfils a owl:ObjectProperty ;
+    rdfs:label "fulfils"@en ;
+    rdfs:domain aai:Action ;
+    rdfs:range aai:Commitment ;
+    skos:definition "Links an action to the commitment it delivers."@en .
+
+aai:requires a owl:ObjectProperty ;
+    rdfs:label "requires"@en ;
+    rdfs:domain aai:Action ;
+    rdfs:range aai:Prerequisite ;
+    skos:definition "Links an action to a prerequisite that must be verified first."@en .
+
+aai:createdBy a owl:ObjectProperty , owl:FunctionalProperty ;
+    rdfs:label "createdBy"@en ;
+    rdfs:domain aai:Action ;
+    rdfs:range aai:Rep ;
+    skos:definition "Links an action to the rep or assistant session owner who created it. Independent of who is assigned."@en .
+
+aai:approvedBy a owl:ObjectProperty ;
+    rdfs:label "approvedBy"@en ;
+    rdfs:domain aai:Action ;
+    rdfs:range aai:Rep ;
+    skos:definition "Links an action to the rep who approved it."@en .
+
+aai:madeBy a owl:ObjectProperty ;
+    rdfs:label "madeBy"@en ;
+    rdfs:domain aai:Commitment ;
+    rdfs:range aai:Rep ;
+    skos:definition "Links a commitment to the rep who made it."@en .
+
+aai:memberOf a owl:ObjectProperty ;
+    rdfs:label "memberOf"@en ;
+    rdfs:domain aai:Rep ;
+    rdfs:range aai:Team ;
+    skos:definition "Links a rep to a team they belong to."@en .
+
+aai:ledBy a owl:ObjectProperty ;
+    rdfs:label "ledBy"@en ;
+    rdfs:domain aai:Team ;
+    rdfs:range aai:Rep ;
+    skos:definition "Links a team to the rep accountable for it."@en .
+
+aai:assignsWork a owl:ObjectProperty ;
+    rdfs:label "assignsWork"@en ;
+    rdfs:domain aai:Assignment ;
+    rdfs:range [ a owl:Class ; owl:unionOf ( aai:Action aai:Interaction ) ] ;
+    skos:definition "Links an assignment to the interaction or action it assigns."@en .
+
+aai:assignedTo a owl:ObjectProperty , owl:FunctionalProperty ;
+    rdfs:label "assignedTo"@en ;
+    rdfs:domain aai:Assignment ;
+    rdfs:range aai:Rep ;
+    skos:definition "Links an assignment to the rep who receives the work."@en .
+
+aai:coversFor a owl:ObjectProperty , owl:FunctionalProperty ;
+    rdfs:label "coversFor"@en ;
+    rdfs:domain aai:Coverage ;
+    rdfs:range aai:Rep ;
+    skos:definition "Links a coverage arrangement to the rep who is unavailable."@en .
+
+aai:coveredBy a owl:ObjectProperty , owl:FunctionalProperty ;
+    rdfs:label "coveredBy"@en ;
+    rdfs:domain aai:Coverage ;
+    rdfs:range aai:Rep ;
+    skos:definition "Links a coverage arrangement to the rep who covers."@en .
+
+#################################################################
+# Data properties (attributes; not on the diagram)
+#################################################################
+
+aai:validFrom a owl:DatatypeProperty ;
+    rdfs:label "validFrom"@en ;
+    rdfs:domain [ a owl:Class ; owl:unionOf ( aai:Affiliation aai:Assignment aai:Capability aai:Coverage aai:ExperienceObservation aai:Intent aai:PlatformRelationship aai:ProductOffering aai:ProductStateRecord aai:Qualification aai:Registration ) ] ;
+    rdfs:range xsd:date ;
+    skos:definition "Start of the period in which the fact holds in the world (effective time)."@en .
+
+aai:validTo a owl:DatatypeProperty ;
+    rdfs:label "validTo"@en ;
+    rdfs:domain [ a owl:Class ; owl:unionOf ( aai:Affiliation aai:Assignment aai:Capability aai:Coverage aai:Intent aai:PlatformRelationship aai:ProductOffering aai:ProductStateRecord aai:Registration ) ] ;
+    rdfs:range xsd:date ;
+    skos:definition "End of the period in which the fact holds in the world. Absent when open."@en .
+
+aai:recordedAt a owl:DatatypeProperty ;
+    rdfs:label "recordedAt"@en ;
+    rdfs:domain [ a owl:Class ; owl:unionOf ( aai:Action aai:Affiliation aai:AssetObservation aai:Commitment aai:ExperienceObservation aai:Intent aai:PlatformRelationship aai:ProductStateRecord aai:Qualification aai:Registration ) ] ;
+    rdfs:range xsd:dateTime ;
+    skos:definition "When the system learned the fact (recorded time). As-of answers exclude facts recorded later."@en .
+
+aai:verificationState a owl:DatatypeProperty ;
+    rdfs:label "verificationState"@en ;
+    rdfs:domain [ a owl:Class ; owl:unionOf ( aai:Action aai:Affiliation aai:ExperienceObservation aai:Intent aai:ProductStateRecord ) ] ;
+    rdfs:range xsd:string ;
+    skos:definition "Candidate, validated, disputed or superseded."@en .
+
+aai:sourceSystem a owl:DatatypeProperty ;
+    rdfs:label "sourceSystem"@en ;
+    rdfs:domain aai:SourceRecord ;
+    rdfs:range xsd:string ;
+    skos:definition "The system or file family the record comes from."@en .
+
+aai:sourceRecordId a owl:DatatypeProperty ;
+    rdfs:label "sourceRecordId"@en ;
+    rdfs:domain aai:SourceRecord ;
+    rdfs:range xsd:string ;
+    skos:definition "The record's identifier in its source."@en .
+
+aai:importVersion a owl:DatatypeProperty ;
+    rdfs:label "importVersion"@en ;
+    rdfs:domain aai:SourceRecord ;
+    rdfs:range xsd:string ;
+    skos:definition "Import batch version, so repeat imports are idempotent."@en .
+
+aai:spanText a owl:DatatypeProperty ;
+    rdfs:label "spanText"@en ;
+    rdfs:domain aai:SourceSpan ;
+    rdfs:range xsd:string ;
+    skos:definition "The exact excerpted text."@en .
+
+aai:startOffset a owl:DatatypeProperty ;
+    rdfs:label "startOffset"@en ;
+    rdfs:domain aai:SourceSpan ;
+    rdfs:range xsd:integer ;
+    skos:definition "Character offset where the span starts in its interaction."@en .
+
+aai:endOffset a owl:DatatypeProperty ;
+    rdfs:label "endOffset"@en ;
+    rdfs:domain aai:SourceSpan ;
+    rdfs:range xsd:integer ;
+    skos:definition "Character offset where the span ends in its interaction."@en .
+
+aai:interactionDate a owl:DatatypeProperty ;
+    rdfs:label "interactionDate"@en ;
+    rdfs:domain aai:Interaction ;
+    rdfs:range xsd:date ;
+    skos:definition "Date the interaction took place."@en .
+
+aai:reviewDeadline a owl:DatatypeProperty ;
+    rdfs:label "reviewDeadline"@en ;
+    rdfs:domain aai:Interaction ;
+    rdfs:range xsd:date ;
+    skos:definition "Date by which the interaction's takeaways must be reviewed."@en .
+
+aai:reviewStatus a owl:DatatypeProperty ;
+    rdfs:label "reviewStatus"@en ;
+    rdfs:domain aai:Interaction ;
+    rdfs:range xsd:string ;
+    skos:definition "Pending, in review, reviewed or no action needed."@en .
+
+aai:metricValue a owl:DatatypeProperty ;
+    rdfs:label "metricValue"@en ;
+    rdfs:domain aai:AssetObservation ;
+    rdfs:range xsd:decimal ;
+    skos:definition "The measured value."@en .
+
+aai:currency a owl:DatatypeProperty ;
+    rdfs:label "currency"@en ;
+    rdfs:domain aai:AssetObservation ;
+    rdfs:range xsd:string ;
+    skos:definition "ISO 4217 currency code of the value."@en .
+
+aai:asOfDate a owl:DatatypeProperty ;
+    rdfs:label "asOfDate"@en ;
+    rdfs:domain aai:AssetObservation ;
+    rdfs:range xsd:date ;
+    skos:definition "Date the value refers to."@en .
+
+aai:methodology a owl:DatatypeProperty ;
+    rdfs:label "methodology"@en ;
+    rdfs:domain aai:AssetObservation ;
+    rdfs:range xsd:string ;
+    skos:definition "Reporter's stated method and scope."@en .
+
+aai:examName a owl:DatatypeProperty ;
+    rdfs:label "examName"@en ;
+    rdfs:domain aai:Qualification ;
+    rdfs:range xsd:string ;
+    skos:definition "Name of the examination or credential, such as Series 65."@en .
+
+aai:registrationStatus a owl:DatatypeProperty ;
+    rdfs:label "registrationStatus"@en ;
+    rdfs:domain aai:Registration ;
+    rdfs:range xsd:string ;
+    skos:definition "Status as stated in the registry evidence."@en .
+
+aai:evidenceType a owl:DatatypeProperty ;
+    rdfs:label "evidenceType"@en ;
+    rdfs:domain aai:ExperienceObservation ;
+    rdfs:range xsd:string ;
+    skos:definition "Testimony or measured evidence."@en .
+
+aai:desiredOutcome a owl:DatatypeProperty ;
+    rdfs:label "desiredOutcome"@en ;
+    rdfs:domain aai:Intent ;
+    rdfs:range xsd:string ;
+    skos:definition "What the party wants to achieve."@en .
+
+aai:reasonOrBlocker a owl:DatatypeProperty ;
+    rdfs:label "reasonOrBlocker"@en ;
+    rdfs:domain aai:Intent ;
+    rdfs:range xsd:string ;
+    skos:definition "The stated reason or blocker for the intent."@en .
+
+aai:dueDate a owl:DatatypeProperty ;
+    rdfs:label "dueDate"@en ;
+    rdfs:domain [ a owl:Class ; owl:unionOf ( aai:Action aai:Commitment ) ] ;
+    rdfs:range xsd:date ;
+    skos:definition "Date by which the work is due."@en .
+
+aai:actionStatus a owl:DatatypeProperty ;
+    rdfs:label "actionStatus"@en ;
+    rdfs:domain aai:Action ;
+    rdfs:range xsd:string ;
+    skos:definition "Proposed, approved, in progress, completed, dismissed or cancelled."@en .
+
+aai:dispositionReason a owl:DatatypeProperty ;
+    rdfs:label "dispositionReason"@en ;
+    rdfs:domain aai:Action ;
+    rdfs:range xsd:string ;
+    skos:definition "Reason recorded for dismissal or cancellation."@en .
+
+aai:acknowledgedAt a owl:DatatypeProperty ;
+    rdfs:label "acknowledgedAt"@en ;
+    rdfs:domain [ a owl:Class ; owl:unionOf ( aai:Assignment aai:Coverage ) ] ;
+    rdfs:range xsd:dateTime ;
+    skos:definition "When the receiving rep accepted responsibility. A notification alone does not set it."@en .
+
+aai:productCategory a owl:DatatypeProperty ;
+    rdfs:label "productCategory"@en ;
+    rdfs:domain aai:ProductOffering ;
+    rdfs:range xsd:string ;
+    skos:definition "Category of the offering, such as custody or managed portfolio service."@en .
+
+aai:catalogVersion a owl:DatatypeProperty ;
+    rdfs:label "catalogVersion"@en ;
+    rdfs:domain [ a owl:Class ; owl:unionOf ( aai:Capability aai:ProductOffering ) ] ;
+    rdfs:range xsd:string ;
+    skos:definition "Approved catalog version the description comes from."@en .
+
+aai:conceptId a owl:DatatypeProperty ;
+    rdfs:label "conceptId"@en ;
+    rdfs:domain aai:IntentConcept ;
+    rdfs:range xsd:string ;
+    skos:definition "Stable identifier of the taxonomy concept."@en .
+
+#################################################################
+# Code lists
+#################################################################
+
+aai:ProductStateScheme a skos:ConceptScheme ;
+    skos:prefLabel "Product State codes"@en .
+
+aai:ProductState_evaluating a aai:ProductState ;
+    skos:prefLabel "evaluating"@en ;
+    skos:inScheme aai:ProductStateScheme .
+
+aai:ProductState_using a aai:ProductState ;
+    skos:prefLabel "using"@en ;
+    skos:inScheme aai:ProductStateScheme .
+
+aai:ProductState_expanding a aai:ProductState ;
+    skos:prefLabel "expanding"@en ;
+    skos:inScheme aai:ProductStateScheme .
+
+aai:ProductState_paused a aai:ProductState ;
+    skos:prefLabel "paused"@en ;
+    skos:inScheme aai:ProductStateScheme .
+
+aai:ProductState_rejected a aai:ProductState ;
+    skos:prefLabel "rejected"@en ;
+    skos:inScheme aai:ProductStateScheme .
+
+aai:ProductState_discontinued a aai:ProductState ;
+    skos:prefLabel "discontinued"@en ;
+    skos:inScheme aai:ProductStateScheme .
+
+aai:MetricTypeScheme a skos:ConceptScheme ;
+    skos:prefLabel "Metric Type codes"@en .
+
+aai:MetricType_regulatoryAum a aai:MetricType ;
+    skos:prefLabel "regulatory AUM"@en ;
+    skos:inScheme aai:MetricTypeScheme .
+
+aai:MetricType_reportedAum a aai:MetricType ;
+    skos:prefLabel "reported AUM"@en ;
+    skos:inScheme aai:MetricTypeScheme .
+
+aai:MetricType_aua a aai:MetricType ;
+    skos:prefLabel "AUA"@en ;
+    skos:inScheme aai:MetricTypeScheme .
+
+aai:AffectedGroupScheme a skos:ConceptScheme ;
+    skos:prefLabel "Affected Group codes"@en .
+
+aai:AffectedGroup_advisor a aai:AffectedGroup ;
+    skos:prefLabel "advisor"@en ;
+    skos:inScheme aai:AffectedGroupScheme .
+
+aai:AffectedGroup_advisorTeam a aai:AffectedGroup ;
+    skos:prefLabel "advisor team"@en ;
+    skos:inScheme aai:AffectedGroupScheme .
+
+aai:AffectedGroup_investorGroup a aai:AffectedGroup ;
+    skos:prefLabel "investor group"@en ;
+    skos:inScheme aai:AffectedGroupScheme .
+
+aai:IntentTaxonomyV1 a aai:TaxonomyVersion ;
+    skos:prefLabel "Intent taxonomy, seed version 1"@en .
+
+aai:IntentConcept_exploringOrComparing a aai:IntentConcept ;
+    skos:prefLabel "exploring or comparing"@en ;
+    aai:conceptId "INT-01" ;
+    aai:inTaxonomy aai:IntentTaxonomyV1 ;
+    skos:inScheme aai:IntentTaxonomyV1 .
+
+aai:IntentConcept_planningAdoptionOrTransition a aai:IntentConcept ;
+    skos:prefLabel "planning adoption or transition"@en ;
+    aai:conceptId "INT-02" ;
+    aai:inTaxonomy aai:IntentTaxonomyV1 ;
+    skos:inScheme aai:IntentTaxonomyV1 .
+
+aai:IntentConcept_expandingUse a aai:IntentConcept ;
+    skos:prefLabel "expanding use"@en ;
+    aai:conceptId "INT-03" ;
+    aai:inTaxonomy aai:IntentTaxonomyV1 ;
+    skos:inScheme aai:IntentTaxonomyV1 .
+
+aai:IntentConcept_requestingSupport a aai:IntentConcept ;
+    skos:prefLabel "requesting support"@en ;
+    aai:conceptId "INT-04" ;
+    aai:inTaxonomy aai:IntentTaxonomyV1 ;
+    skos:inScheme aai:IntentTaxonomyV1 .
+
+aai:IntentConcept_postponing a aai:IntentConcept ;
+    skos:prefLabel "postponing"@en ;
+    aai:conceptId "INT-05" ;
+    aai:inTaxonomy aai:IntentTaxonomyV1 ;
+    skos:inScheme aai:IntentTaxonomyV1 .
+
+aai:IntentConcept_rejectingOrDiscontinuing a aai:IntentConcept ;
+    skos:prefLabel "rejecting or discontinuing"@en ;
+    aai:conceptId "INT-06" ;
+    aai:inTaxonomy aai:IntentTaxonomyV1 ;
+    skos:inScheme aai:IntentTaxonomyV1 .
+
+aai:IntentConcept_unknown a aai:IntentConcept ;
+    skos:prefLabel "unknown"@en ;
+    aai:conceptId "INT-07" ;
+    aai:inTaxonomy aai:IntentTaxonomyV1 ;
+    skos:inScheme aai:IntentTaxonomyV1 .

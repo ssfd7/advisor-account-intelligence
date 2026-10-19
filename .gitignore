@@ -1,0 +1,9 @@
+# Private interview preparation
+interview/
+
+# Local Python environment
+.venv/
+__pycache__/
+
+# Personal Claude Code settings
+.claude/settings.local.json
