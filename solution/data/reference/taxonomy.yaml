@@ -1,0 +1,9 @@
+version: 1
+concepts:
+  - {id: INT-01, label: exploring or comparing}
+  - {id: INT-02, label: planning adoption or transition}
+  - {id: INT-03, label: expanding use}
+  - {id: INT-04, label: requesting support}
+  - {id: INT-05, label: postponing}
+  - {id: INT-06, label: rejecting or discontinuing}
+  - {id: INT-07, label: unknown}

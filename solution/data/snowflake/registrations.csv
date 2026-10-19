@@ -1,0 +1,3 @@
+registration_id,party_id,registration_type,with_firm_id,status,status_date,recorded_at
+REG-001,FIRM-001,investment adviser registration,,approved,2016-03-01,2019-04-05
+REG-002,ADV-002,investment adviser representative,FIRM-002,approved,2021-09-30,2021-10-02

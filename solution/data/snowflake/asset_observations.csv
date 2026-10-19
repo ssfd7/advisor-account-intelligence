@@ -1,0 +1,3 @@
+observation_id,metric_type,value,currency,reporting_entity,measured_party,platform_id,product_id,scope,as_of_date,methodology,recorded_at
+AST-001,reported AUM,300000000,USD,FIRM-001,FIRM-001,,,firm-wide across all custodians,2025-12-31,firm self-reported,2026-01-10
+AST-002,AUA,180000000,USD,PLAT-A,FIRM-001,PLAT-A,,Cedar Ridge relationship on Platform A,2026-01-31,Platform A AUA definition v3 (includes managed assets),2026-02-05

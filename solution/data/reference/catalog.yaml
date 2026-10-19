@@ -1,0 +1,30 @@
+catalog_version: "2026.1"
+platforms:
+  - {id: PLAT-A, name: Platform A, service_types: [custody, managed portfolios]}
+  - {id: PLAT-B, name: Platform B, service_types: [managed portfolios]}
+offerings:
+  - id: CUST-A
+    name: Custody Service A
+    platform: PLAT-A
+    category: custody
+    valid_from: 2019-01-01
+    capabilities:
+      - {id: CAP-CUST-A-1, name: Daily position reconciliation, valid_from: 2019-01-01}
+  - id: SVC-A
+    name: Managed Portfolio Service A
+    platform: PLAT-A
+    category: managed portfolio service
+    valid_from: 2020-06-01
+    capabilities:
+      - {id: CAP-SVC-A-1, name: Quarterly investor statements, valid_from: 2020-06-01}
+  - id: SVC-B
+    name: Managed Portfolio Service B
+    platform: PLAT-B
+    category: managed portfolio service
+    valid_from: 2025-09-01
+    capabilities:
+      - {id: CAP-SVC-B-1, name: Consolidated investor statements with plain-language summary, valid_from: 2025-09-01}
+      - {id: CAP-SVC-B-2, name: Advisor portal with statement annotations, valid_from: 2025-09-01}
+    prerequisites:
+      - {id: PRQ-001, name: Portfolio accounting integration verified}
+# Capabilities not listed are unknown, not absent. Integration with specific portfolio accounting systems is not documented.

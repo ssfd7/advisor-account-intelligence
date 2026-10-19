@@ -2,7 +2,7 @@
 
 A design for an evidence-grounded AI assistant that helps an investment platform's relationship teams prepare QBRs with advisors and advisory firms, and makes sure what was learned in a QBR is acted on, even when the rep who heard it is unavailable or leaves. All advisor, firm, product and asset data is synthetic; Platform A, Platform B and their offerings are fictional.
 
-**Status (2026-10-19):** business requirements, solution design, memory architecture and a first conceptual model (draft v0.1) are drafted. No prototype code exists yet. The repository contains generators for the diagrams and the model, and a structural check that the diagram and the OWL Turtle agree.
+**Status (2026-10-19):** business requirements, solution design, memory architecture and a first conceptual model (draft v0.1) are drafted. A first runnable demo, with no LLM, plays the decisive scenario end to end over a LadybugDB graph and a mock task store, and 20 golden cases pass. Extraction and the assistant are still stand-ins: fixture takeaways and rule-based action proposals. See [`solution/DEMO.md`](solution/DEMO.md).
 
 ## The problem and the product
 
@@ -58,6 +58,8 @@ Synthetic file feeds stand in for Snowflake and Salesforce exports. Ingestion pr
 | [`solution/memory-architecture.md`](solution/memory-architecture.md) | Memory types, scopes, temporal model, supersession, write path, multi-agent handoffs, context assembly, decay and memory evaluation |
 | [`solution/model/`](solution/model/README.md) | The conceptual model, draft v0.1: Draw.io diagram (overview and four detail pages) with PNG renderings, OWL Turtle, stewardship and status per term, and a README with query approaches, decisions and checks |
 | `solution/diagrams/` | Architecture and design diagrams (Draw.io sources and PNGs): solution architecture, product state transitions, QBR continuity workflow, memory types and scopes, write path, context assembly, agent handoff contract |
+| [`solution/DEMO.md`](solution/DEMO.md) | The phase 1 demo: what each step shows, how it is built, which golden cases pass, and what it taught the model |
+| `solution/aai/`, `solution/data/`, `solution/tests/` | Demo code (ingestion, memory promotion, task store, queries, narrated scenario), synthetic fixtures and golden tests |
 | `solution/tools/` | Generators for the model and diagrams, the renderer and the structural model check |
 | [`AGENTS.md`](AGENTS.md) | Modelling and Draw.io conventions for AI agents working in this repository |
 
@@ -66,12 +68,22 @@ Synthetic file feeds stand in for Snowflake and Salesforce exports. Ingestion pr
 1. The [product brief](business/advisor-account-intelligence-product.md), sections 4–9, for the problem, scope, scenario and requirements.
 2. [`solution/memory-architecture.md`](solution/memory-architecture.md), for how the system remembers and forgets.
 3. [`solution/model/README.md`](solution/model/README.md), which shows each model page as an image and maps every competency question to a query path. The editable source is `solution/model/aai-model.drawio` (diagrams.net).
-4. Brief section 13, the golden test cases each prototype run will have to pass.
+4. Brief section 13, the golden test cases, and [`solution/DEMO.md`](solution/DEMO.md) for the ones the demo already passes. Run the demo to see the scenario play out.
+
+## Running the demo
+
+```bash
+python3 -m venv .venv && .venv/bin/pip install -r solution/requirements.txt
+cd solution
+../.venv/bin/python -m aai.demo      # narrated scenario
+../.venv/bin/python -m pytest -q     # golden cases
+```
 
 ## Working with the model and diagrams
 
+From the project root:
+
 ```bash
-python3 -m venv .venv && .venv/bin/pip install -r solution/tools/requirements.txt
 .venv/bin/python solution/tools/build_model.py        # Draw.io model and Turtle from model_spec.py
 .venv/bin/python solution/tools/check_model.py        # diagram/Turtle structural checks
 .venv/bin/python solution/tools/build_diagrams.py     # architecture and design diagrams

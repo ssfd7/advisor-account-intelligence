@@ -1,0 +1,41 @@
+# Candidate takeaways for one interaction. In the demo these are fixtures standing in for LLM extraction (pipeline step 4).
+interaction_id: INT-2026-01-QBR-CR
+extractor: fixture-v1
+candidates:
+  - id: CAND-01-1
+    kind: experience
+    span: her investors find the Managed Portfolio Service A statements difficult to understand
+    product: SVC-A
+    speaker: ADV-001
+    affected: investor group
+    evidence_type: testimony
+    summary: Investors find Service A statements hard to understand
+  - id: CAND-01-2
+    kind: experience
+    span: her team spends hours each quarter explaining them
+    product: SVC-A
+    speaker: ADV-001
+    affected: advisor team
+    evidence_type: testimony
+    summary: Advisor team spends hours explaining statements
+  - id: CAND-01-3
+    kind: intent
+    span: She is considering Managed Portfolio Service B on Platform B
+    concept: exploring or comparing
+    target: SVC-B
+    alternatives: [SVC-A]
+    speaker: ADV-001
+    desired_outcome: Clearer investor reporting
+    reason: Statement difficulty with Service A
+    proposes_state: evaluating
+  - id: CAND-01-4
+    kind: commitment
+    span: I promised to arrange a session with a product specialist on reporting and integration.
+    product: SVC-B
+    made_by: REP-JORDAN
+    due: 2026-02-28
+    summary: Specialist session on reporting and integration
+review:
+  by: REP-JORDAN
+  at: 2026-01-16
+  decision: confirmed

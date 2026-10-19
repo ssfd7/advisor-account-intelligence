@@ -1,0 +1,19 @@
+teams:
+  - id: TEAM-CR
+    name: Cedar Ridge relationship team
+    lead: REP-LEE
+    members: [REP-JORDAN, REP-PRIYA, REP-LEE]
+    relationships: [FIRM-001, ADV-001]
+    review_days: 5
+  - id: TEAM-NF
+    name: Northfield relationship team
+    lead: REP-SAM
+    members: [REP-OMAR, REP-SAM]
+    relationships: [FIRM-002, ADV-002]
+    review_days: 5
+reps:
+  - {id: REP-JORDAN, name: Jordan}
+  - {id: REP-PRIYA, name: Priya}
+  - {id: REP-LEE, name: Alex Lee}
+  - {id: REP-OMAR, name: Omar}
+  - {id: REP-SAM, name: Sam}

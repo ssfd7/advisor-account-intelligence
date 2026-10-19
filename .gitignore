@@ -7,3 +7,7 @@ __pycache__/
 
 # Personal Claude Code settings
 .claude/settings.local.json
+
+# Demo runtime state (graph and task store)
+solution/.data/
+.pytest_cache/

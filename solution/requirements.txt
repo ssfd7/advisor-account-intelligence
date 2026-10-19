@@ -3,3 +3,6 @@ numpy
 scipy
 rdflib
 pillow
+real_ladybug
+pyyaml
+pytest

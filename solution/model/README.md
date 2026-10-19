@@ -60,7 +60,8 @@ Open:
 
 - Whether Commitment and Action should merge once a commitment is approved as an action, or stay linked by `fulfils` as now.
 - Whether Discrepancy should also link registry facts (Registration, Affiliation), not only Product State Records.
-- Whether Platform should become a kind of Party if platforms are ever the subject of interactions.
+- Whether Platform should become a kind of Party. The demo found a concrete case: Platform A reports AUA, but `reportedBy` ranges over Party ([DEMO.md](../DEMO.md), findings).
+- Which store is authoritative for Assignment and Coverage. In the phase 1 demo they live in the task store and only outcomes reach the graph.
 
 ## Formal ontology
 

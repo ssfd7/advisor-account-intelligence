@@ -1,0 +1,3 @@
+platform_relationship_id,party_id,platform_id,status,valid_from,valid_to,recorded_at
+PREL-001,FIRM-001,PLAT-A,active,2020-01-15,,2020-01-20
+PREL-002,FIRM-002,PLAT-A,active,2022-03-01,,2022-03-03

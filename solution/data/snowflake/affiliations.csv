@@ -1,0 +1,4 @@
+affiliation_id,advisor_id,firm_id,role,valid_from,valid_to,recorded_at
+AFF-000,ADV-001,FIRM-003,investment adviser representative,2014-06-02,2019-03-29,2019-04-05
+AFF-001,ADV-001,FIRM-001,investment adviser representative,2019-04-01,,2019-04-05
+AFF-002,ADV-002,FIRM-002,investment adviser representative,2021-09-15,,2021-09-20

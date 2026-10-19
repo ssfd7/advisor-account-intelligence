@@ -1,0 +1,17 @@
+interaction_id: INT-2026-03-QBR-NF
+extractor: fixture-v1
+candidates:
+  - id: CAND-NF-1
+    kind: intent
+    span: May is exploring Managed Portfolio Service B for a new group of retirement clients.
+    concept: exploring or comparing
+    target: SVC-B
+    alternatives: []
+    speaker: ADV-002
+    desired_outcome: Managed option for retirement clients
+    reason: New client segment
+    proposes_state: evaluating
+review:
+  by: REP-OMAR
+  at: 2026-03-12
+  decision: confirmed
