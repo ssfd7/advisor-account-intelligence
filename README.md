@@ -103,6 +103,10 @@ From the project root:
 | 4 | Memory lifecycle: consolidation and decay without losing rejection reasons or required history |
 | 5 | Reliable service at team scale: latency, concurrency and cost per accepted brief |
 
+## Licence
+
+Copyright 2026 Radu Marian. Licensed under the [Apache License 2.0](LICENSE).
+
 ## Limits
 
 The problem statements, targets and ROI figures are hypotheses to validate with a platform relationship team; none is a measured result. The domain distinctions (Series exams, IAPD, Form ADV regulatory AUM, AUM versus AUA) were checked against FINRA, SEC, Investor.gov and issuer sources on 2026-10-19; registration and qualification rules still need jurisdiction-specific review, and nothing here decides authorization to practice or investment suitability. The model is a draft: every term is `proposed`, the Turtle parses with rdflib and matches the diagram but has not been run through a reasoner, and the Draw.io file has been checked in the diagrams.net viewer, not opened in the desktop app. The overview page is dense, and two detail pages have minor label crowding noted in the model README.
