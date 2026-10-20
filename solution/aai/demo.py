@@ -1,13 +1,16 @@
 """Narrated phase 1 scenario: absence before review, as-of memory, and evidence-backed follow-up.
 
-    cd solution && ../.venv/bin/python -m aai.demo
+    cd solution && ../.venv/bin/python -m aai.demo                          # fixtures only, no LLM
+    cd solution && ../.venv/bin/python -m aai.demo --extractions llm --brief  # Claude extraction and cited brief
 
-Rebuilds solution/.data/ from the fixtures each time. No LLM is called: candidate takeaways come from fixture files
-standing in for extraction, and actions are proposed by rules standing in for the assistant.
+Rebuilds solution/.data/ each time. By default no LLM is called: candidate takeaways come from fixture files and
+actions are proposed by rules. `--extractions llm` reads takeaways written by `python -m aai.llm extract`;
+`--brief` asks Claude for a cited brief after the review and checks it before writing it to .data/briefs/.
 """
+import argparse
 from datetime import date
 
-from . import GRAPH_DB, TASK_DB
+from . import GRAPH_DB, STATE, TASK_DB
 from . import queries as q
 from .graph import Graph
 from .ingest import load
@@ -50,14 +53,20 @@ def expect_refusal(label, fn):
 
 
 def main():
+    args = argparse.ArgumentParser()
+    args.add_argument("--extractions", choices=["fixtures", "llm"], default="fixtures")
+    args.add_argument("--brief", action="store_true")
+    args = args.parse_args()
+    folder = "extractions" if args.extractions == "fixtures" else "extractions-llm"
     roster = Roster()
     g = Graph(GRAPH_DB, fresh=True)
     store = TaskStore(TASK_DB, roster, fresh=True)
 
     section("1. Ingest synthetic Snowflake and Salesforce exports into graph memory")
-    report = load(g, store)
+    report = load(g, store, extractions=folder)
+    print(f"  candidate takeaways from: data/salesforce/{folder}/")
     print(f"  first import:  {report['counts']}")
-    print(f"  second import: {load(g, store)['counts']}   (same files, nothing added)")
+    print(f"  second import: {load(g, store, extractions=folder)['counts']}   (same files, nothing added)")
     for m in report["identity"]:
         print(f"  identity: {m['names'][0]} ({m['a']}) vs {m['names'][1]} ({m['b']}): name similarity {m['similarity']}, "
               f"same CRD: {m['same_crd']} -> {m['decision']}")
@@ -85,7 +94,8 @@ def main():
     store.mark_unavailable("REP-JORDAN", date(2026, 3, 19), "leave")
     table(store.queue("TEAM-CR", date(2026, 3, 19)), ["item", "type", "status", "owner", "due", "overdue", "handoff"])
     print("  candidates waiting in the March QBR:")
-    table([{"id": c["id"], "kind": c["kind"], "status": c["status"]} for c in store.candidates(MAR)], ["id", "kind", "status"])
+    table([{"id": c["id"], "kind": c["kind"], "status": c["status"], "span": c["payload"].get("span", "")[:60] if c["status"] == "rejected"
+            else "", "reason": c["reason"]} for c in store.candidates(MAR)], ["id", "kind", "status", "reason"])
     print("  candidates in the February email:")
     table([{"id": c["id"], "kind": c["kind"], "status": c["status"], "quotes": c["quotes"]} for c in store.candidates(EMAIL)],
           ["id", "kind", "status", "quotes"])
@@ -143,12 +153,17 @@ def main():
 
     section("10. 23 March: the unacknowledged email review escalates; the lead resolves it")
     print(f"  escalated: {store.escalate_overdue(date(2026, 3, 23))}")
-    item = store.resolve_review("REP-LEE", EMAIL, date(2026, 3, 23), {}, promote,
-                                no_action_reason="Only repeats the January QBR; no new takeaways")
-    print(f"  {EMAIL}: {item['status']} by {item['resolved_by']}: {item['note']}")
+    open_ = store.candidates(EMAIL, "candidate")
+    for c in open_:
+        print(f"  lead decides {c['id']} ({c['kind']}): confirm")
+    item = store.resolve_review("REP-LEE", EMAIL, date(2026, 3, 23), {c["id"]: "confirm" for c in open_}, promote,
+                                no_action_reason=None if open_ else "Only repeats the January QBR; no new takeaways")
+    print(f"  {EMAIL}: {item['status']} by {item['resolved_by']}" + (f": {item['note']}" if item["note"] else ""))
 
     section("11. 27 March: completion requires evidence")
-    service = next(p for p in proposals if p["id"].startswith("ACT:CAND-03-2"))
+    if args.brief:
+        write_brief(g, roster, proposals)
+    service = next((p for p in proposals if p["title"].startswith("Open service issue")), proposals[0])
     expect_refusal("close without evidence",
                    lambda: store.complete_action("REP-PRIYA", service["id"], date(2026, 3, 27), "", write_completion(g)))
     done = store.complete_action("REP-PRIYA", service["id"], date(2026, 3, 27),
@@ -166,6 +181,25 @@ def main():
     section("Event log")
     for e in store.events():
         print(f"  {e['at']}  {e['actor']:10}  {e['event']:24}  {e['detail']}")
+
+
+def write_brief(g, roster, proposals):
+    from .brief import bundle, generate, render, verify
+    section("9b. Cited brief from Claude, checked before anyone sees it")
+    at = date(2026, 3, 20)
+    items = bundle(g, roster, "REP-PRIYA", "FIRM-001", "ADV-001", at, proposals)
+    brief, usage = generate(items, "Cedar Ridge Advisory", at)
+    problems = verify(brief, items)
+    out = STATE / "briefs" / f"FIRM-001-{at}.md"
+    out.parent.mkdir(parents=True, exist_ok=True)
+    out.write_text(render(brief, items, "Cedar Ridge Advisory", "Maya Chen", at, problems))
+    print(f"  bundle items: {len(items)}; tokens in {usage.input_tokens}, out {usage.output_tokens}, "
+          f"cache read {usage.cache_read_input_tokens}")
+    print(f"  evidence check: {'passed' if not problems else 'FAILED'}")
+    for p in problems:
+        print(f"    - {p}")
+    print(f"  headline: {brief.headline.text} [{', '.join(brief.headline.cites)}]")
+    print(f"  written to {out.relative_to(STATE.parent)}")
 
 
 if __name__ == "__main__":

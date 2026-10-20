@@ -6,3 +6,5 @@ pillow
 real_ladybug
 pyyaml
 pytest
+anthropic
+pydantic

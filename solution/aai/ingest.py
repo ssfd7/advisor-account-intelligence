@@ -51,7 +51,8 @@ def parse_interaction(path: Path):
     return meta, body
 
 
-def load(g: Graph, store: TaskStore, data: Path = DATA) -> dict:
+def load(g: Graph, store: TaskStore, data: Path = DATA, extractions: str = "extractions") -> dict:
+    """`extractions` names the folder of candidate takeaways: the fixtures, or `extractions-llm` from aai.llm."""
     sf, crm, ref = data / "snowflake", data / "salesforce", data / "reference"
     report = {"identity": []}
 
@@ -156,14 +157,16 @@ def load(g: Graph, store: TaskStore, data: Path = DATA) -> dict:
         g.link("Interaction", iid, "authoredBy", "Rep", meta["author"])
         g.link("Interaction", iid, "ownedByTeam", "Team", meta["team"])
         store.save_interaction(iid, meta["team"], meta["author"], meta["recorded_at"])
-        ext_path = crm / "extractions" / f"{iid}.yaml"
+        ext_path = crm / extractions / f"{iid}.yaml"
         if not ext_path.exists():
             continue  # extraction failed: the review item stays pending
         ext = yaml.safe_load(ext_path.read_text())
         for c in ext.get("candidates") or []:
             start = bodies[iid].find(c["span"])
-            if start < 0:
-                raise ValueError(f"{c['id']}: span not found in {iid}; candidate rejected")
+            if start < 0:  # not verbatim: never enters memory, stays visible to the reviewer
+                store.add_candidate(c["id"], iid, c["kind"], {k: v for k, v in c.items() if k not in ("id", "kind")},
+                                    None, rejected="span not found verbatim in the note")
+                continue
             span_id = f"{iid}#{start}-{start + len(c['span'])}"
             g.node("SourceSpan", span_id, spanText=c["span"], startOffset=start, endOffset=start + len(c["span"]))
             g.link("SourceSpan", span_id, "partOf", "Interaction", iid)
@@ -177,7 +180,7 @@ def load(g: Graph, store: TaskStore, data: Path = DATA) -> dict:
                     g.link("SourceSpan", span_id, "quotes", "SourceSpan", quoted)
                     break
             payload = {k: v for k, v in c.items() if k not in ("id", "kind", "span")}
-            if "concept" in payload:
+            if payload.get("concept"):
                 payload["concept"] = concept_ids[payload["concept"]]
             store.add_candidate(c["id"], iid, c["kind"], payload, span_id, quoted)
         review = ext.get("review")

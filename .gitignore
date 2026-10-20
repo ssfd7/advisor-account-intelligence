@@ -11,3 +11,6 @@ __pycache__/
 # Demo runtime state (graph and task store)
 solution/.data/
 .pytest_cache/
+
+# Personal scratch files
+work/

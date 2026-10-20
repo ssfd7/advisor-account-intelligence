@@ -2,7 +2,7 @@
 
 A design for an evidence-grounded AI assistant that helps an investment platform's relationship teams prepare QBRs with advisors and advisory firms, and makes sure what was learned in a QBR is acted on, even when the rep who heard it is unavailable or leaves. All advisor, firm, product and asset data is synthetic; Platform A, Platform B and their offerings are fictional.
 
-**Status (2026-10-19):** business requirements, solution design, memory architecture and a first conceptual model (draft v0.1) are drafted. A first runnable demo, with no LLM, plays the decisive scenario end to end over a LadybugDB graph and a mock task store, and 20 golden cases pass. Extraction and the assistant are still stand-ins: fixture takeaways and rule-based action proposals. See [`solution/DEMO.md`](solution/DEMO.md).
+**Status (2026-10-19):** business requirements, solution design, memory architecture and a first conceptual model (draft v0.1) are drafted. A first runnable demo, with no LLM, plays the decisive scenario end to end over a LadybugDB graph and a mock task store, and 20 golden cases pass. Claude (`claude-opus-5-5`) extracts candidate takeaways from the QBR notes with structured outputs and writes a cited brief that a verifier checks before anyone sees it. On the synthetic notes it copied every span verbatim, recovered all hand-labelled takeaways and ignored an injected instruction; these are single runs, not accuracy rates. See [`solution/DEMO.md`](solution/DEMO.md) and the [sample brief](solution/samples/brief-FIRM-001-2026-03-20.md).
 
 ## The problem and the product
 

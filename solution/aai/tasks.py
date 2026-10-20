@@ -103,10 +103,11 @@ class TaskStore:
     def review_item(self, interaction_id):
         return self._one("SELECT * FROM review_items WHERE interaction_id = ?", interaction_id)
 
-    def add_candidate(self, cid, interaction_id, kind, payload, span_id, quotes=None):
-        status = "repetition" if quotes else "candidate"
-        self.db.execute("INSERT OR IGNORE INTO candidates VALUES (?, ?, ?, ?, ?, ?, ?, NULL, NULL, NULL)",
-                        (cid, interaction_id, kind, json.dumps(payload, default=str), status, span_id, quotes))
+    def add_candidate(self, cid, interaction_id, kind, payload, span_id, quotes=None, rejected=None):
+        status = "rejected" if rejected else "repetition" if quotes else "candidate"
+        self.db.execute("INSERT OR IGNORE INTO candidates VALUES (?, ?, ?, ?, ?, ?, ?, ?, NULL, ?)",
+                        (cid, interaction_id, kind, json.dumps(payload, default=str), status, span_id, quotes,
+                         "system" if rejected else None, rejected))
         self.db.commit()
 
     def candidates(self, interaction_id, status=None):

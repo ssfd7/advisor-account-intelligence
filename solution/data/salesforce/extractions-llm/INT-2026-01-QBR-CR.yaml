@@ -1,0 +1,69 @@
+interaction_id: INT-2026-01-QBR-CR
+extractor: claude-opus-5-5
+candidates:
+- id: LLM-INT-2026-01-QBR-CR-1
+  kind: experience
+  span: her investors find the Managed Portfolio Service A statements difficult to
+    understand
+  speaker: ADV-001
+  product: SVC-A
+  affected: investor group
+  evidence_type: testimony
+  summary: Advisor reports her investors find SVC-A statements difficult to understand.
+- id: LLM-INT-2026-01-QBR-CR-2
+  kind: experience
+  span: her team spends hours each quarter explaining them
+  speaker: ADV-001
+  product: SVC-A
+  affected: advisor team
+  evidence_type: testimony
+  summary: Advisor's team spends hours each quarter explaining SVC-A statements to
+    investors.
+- id: LLM-INT-2026-01-QBR-CR-3
+  kind: intent
+  span: She is considering Managed Portfolio Service B on Platform B and asked for
+    a comparison of reporting and integration capabilities.
+  speaker: ADV-001
+  concept: exploring or comparing
+  target: SVC-B
+  alternatives:
+  - SVC-A
+  desired_outcome: A comparison of reporting and integration capabilities
+  reason: Investors find Managed Portfolio Service A statements difficult to understand
+  proposes_state: evaluating
+- id: LLM-INT-2026-01-QBR-CR-4
+  kind: experience
+  span: Custody with Platform A is working well and is not under review.
+  speaker: ADV-001
+  product: CUST-A
+  affected: advisor
+  evidence_type: testimony
+  summary: Custody on Platform A is working well and is not under review.
+- id: LLM-INT-2026-01-QBR-CR-5
+  kind: commitment
+  span: I promised to arrange a session with a product specialist on reporting and
+    integration.
+  speaker: REP-JORDAN
+  product: SVC-B
+  summary: Arrange a session with a product specialist on reporting and integration.
+  made_by: REP-JORDAN
+unmapped: []
+reviewer_notes:
+- The custody statement is not explicitly attributed to Maya; it was assigned to ADV-001
+  as advisor testimony. Please confirm the speaker.
+- 'The ''reason'' for considering SVC-B is inferred from context: the SVC-A statement
+  difficulties. The note does not explicitly link them.'
+- Integration capabilities may relate to SVC-B prerequisite PRQ-001 (portfolio accounting
+  integration verified). The note does not state it as a blocker, so no blocker was
+  set.
+- The commitment's product is assigned to SVC-B because it supports the requested
+  comparison. It may cover both SVC-A and SVC-B. No due date was stated.
+usage:
+  input: 845
+  output: 1750
+  cache_read: 0
+  cache_write: 2910
+review:
+  by: REP-JORDAN
+  at: 2026-01-16
+  decision: confirmed

@@ -30,10 +30,12 @@ def product_state(g: Graph, roster: Roster, user: str, party: str, product: str,
     discrepancies = g.run("""MATCH (x:Discrepancy)-[:involves]->(s:ProductStateRecord)-[:stateOf]->(:ProductRelationship {id: $pr})
                              WHERE x.raisedAt <= $ka RETURN DISTINCT x.id AS id, x.description AS description""", pr=pr, ka=known_at)
     if not records:
-        return {"product": product, "state": "unknown", "source": None, "since": None, "history": [], "discrepancies": []}
+        return {"product": product, "state": "unknown", "source": None, "since": None, "history": [], "discrepancies": [],
+                "discrepancy_ids": []}
     top = records[0]
     return {"product": product, "state": top["state"], "source": top["source"], "since": top["validFrom"],
-            "history": records, "discrepancies": [x["description"] for x in discrepancies]}
+            "history": records, "discrepancies": [x["description"] for x in discrepancies],
+            "discrepancy_ids": [x["id"] for x in discrepancies]}
 
 
 def profile(g: Graph, roster: Roster, user: str, advisor: str, valid_at: date, known_at: date) -> dict:
@@ -101,14 +103,17 @@ def experience(g: Graph, roster: Roster, user: str, firm: str, valid_at: date, k
                          (e)-[:supportedBy]->(s:SourceSpan)
                    WHERE e.validFrom <= $va AND e.recordedAt <= $ka
                    OPTIONAL MATCH (e)-[:reportedBy]->(a:Advisor)
-                   RETURN o.name AS product, e.summary AS summary, e.affectedGroup AS affected, e.evidenceType AS evidence,
-                          a.name AS reportedBy, i.id AS interaction, e.validFrom AS date ORDER BY e.validFrom""",
+                   RETURN e.id AS id, o.name AS product, e.summary AS summary, e.affectedGroup AS affected, e.evidenceType AS evidence,
+                          a.name AS reportedBy, i.id AS interaction, e.validFrom AS date,
+                          s.startOffset AS spanStart, s.endOffset AS spanEnd ORDER BY e.validFrom""",
                 f=firm, va=valid_at, ka=known_at)
     quoted = g.run("""MATCH (q:SourceSpan)-[:quotes]->(s:SourceSpan)-[:partOf]->(i:Interaction)-[:withParty]->(:Firm {id: $f}),
                             (q)-[:partOf]->(qi:Interaction)
-                      RETURN qi.id AS by, i.id AS original""", f=firm)
-    for o in obs:
-        o["repeated_in"] = [q["by"] for q in quoted if q["original"] == o["interaction"]]
+                      RETURN qi.id AS by, i.id AS original, s.startOffset AS spanStart, s.endOffset AS spanEnd""", f=firm)
+    for o in obs:  # repeated where a later span quotes text overlapping this observation's own span
+        o["repeated_in"] = sorted({q["by"] for q in quoted if q["original"] == o["interaction"]
+                                   and q["spanStart"] < o["spanEnd"] and o["spanStart"] < q["spanEnd"]})
+        del o["spanStart"], o["spanEnd"]
     return obs
 
 

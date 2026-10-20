@@ -55,22 +55,23 @@ def promoter(g: Graph, interactions: dict):
         valid = meta["date"]
         kind = cand["kind"]
         if kind == "experience":
-            g.node("ExperienceObservation", cand["id"], summary=p["summary"], affectedGroup=p["affected"],
-                   evidenceType=p["evidence_type"], validFrom=valid, recordedAt=at, verificationState="validated")
+            g.node("ExperienceObservation", cand["id"], summary=p.get("summary") or "", affectedGroup=p.get("affected"),
+                   evidenceType=p.get("evidence_type") or "testimony", validFrom=valid, recordedAt=at, verificationState="validated")
             g.link("Interaction", iid, "records", "ExperienceObservation", cand["id"])
             g.link("ExperienceObservation", cand["id"], "concerns", "ProductOffering", p["product"])
             g.link("ExperienceObservation", cand["id"], "supportedBy", "SourceSpan", cand["span_id"])
-            if p["speaker"].startswith("ADV-"):
+            if (p.get("speaker") or "").startswith("ADV-"):
                 g.link("ExperienceObservation", cand["id"], "reportedBy", "Advisor", p["speaker"])
         elif kind == "intent":
             previous = g.one("""MATCH (i:Intent)-[:targets]->(:ProductOffering {id: $t}), (i)-[:expressedBy]->(:Advisor {id: $s})
                                 WHERE i.validFrom <= $vf RETURN i.id AS id ORDER BY i.validFrom DESC LIMIT 1""",
-                             t=p["target"], s=p["speaker"], vf=valid)
-            g.node("Intent", cand["id"], desiredOutcome=p["desired_outcome"], reasonOrBlocker=p["reason"],
+                             t=p["target"], s=p.get("speaker") or meta["advisor"], vf=valid)
+            g.node("Intent", cand["id"], desiredOutcome=p.get("desired_outcome"), reasonOrBlocker=p.get("reason"),
                    validFrom=valid, recordedAt=at, verificationState="validated")
             g.link("Interaction", iid, "expresses", "Intent", cand["id"])
             g.link("Intent", cand["id"], "targets", "ProductOffering", p["target"])
-            g.link("Intent", cand["id"], "expressedBy", "Advisor", p["speaker"])
+            if (p.get("speaker") or "").startswith("ADV-"):
+                g.link("Intent", cand["id"], "expressedBy", "Advisor", p["speaker"])
             g.link("Intent", cand["id"], "supportedBy", "SourceSpan", cand["span_id"])
             g.link("Intent", cand["id"], "classifiedAs", "IntentConcept", p["concept"])
             for alt in p.get("alternatives", []):
@@ -82,9 +83,9 @@ def promoter(g: Graph, interactions: dict):
                 add_state(g, f"PSR:{cand['id']}", pr, p["proposes_state"], "qbr", valid, at,
                           (f"salesforce:interaction:{iid}", "salesforce", iid, meta["version"]))
         elif kind == "commitment":
-            g.node("Commitment", cand["id"], summary=p["summary"], dueDate=date.fromisoformat(str(p["due"])), status="open", recordedAt=at)
+            g.node("Commitment", cand["id"], summary=p.get("summary") or "", dueDate=date.fromisoformat(str(p["due"])) if p.get("due") else None, status="open", recordedAt=at)
             g.link("Interaction", iid, "records", "Commitment", cand["id"])
-            g.link("Commitment", cand["id"], "madeBy", "Rep", p["made_by"])
+            g.link("Commitment", cand["id"], "madeBy", "Rep", p.get("made_by") or meta["author"])
         elif kind == "commitment_status":
             g.run("MATCH (c:Commitment {id: $id}) SET c.status = $s", id=p["commitment"], s=p["status"])
 
