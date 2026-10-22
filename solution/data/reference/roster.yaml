@@ -1,19 +1,27 @@
+# owner: the relationship manager who owns follow-up for the team's relationships.
+# sme: the subject-matter expert who approves findings before they enter memory.
 teams:
   - id: TEAM-CR
     name: Cedar Ridge relationship team
     lead: REP-LEE
-    members: [REP-JORDAN, REP-PRIYA, REP-LEE]
+    owner: REP-JORDAN
+    sme: REP-DANA
+    members: [REP-JORDAN, REP-PRIYA, REP-LEE, REP-DANA]
     relationships: [FIRM-001, ADV-001]
     review_days: 5
   - id: TEAM-NF
     name: Northfield relationship team
     lead: REP-SAM
-    members: [REP-OMAR, REP-SAM]
+    owner: REP-OMAR
+    sme: REP-KAI
+    members: [REP-OMAR, REP-SAM, REP-KAI]
     relationships: [FIRM-002, ADV-002]
     review_days: 5
 reps:
-  - {id: REP-JORDAN, name: Jordan}
-  - {id: REP-PRIYA, name: Priya}
-  - {id: REP-LEE, name: Alex Lee}
-  - {id: REP-OMAR, name: Omar}
-  - {id: REP-SAM, name: Sam}
+  - {id: REP-JORDAN, name: Jordan, role: relationship manager}
+  - {id: REP-PRIYA, name: Priya, role: relationship manager}
+  - {id: REP-LEE, name: Alex Lee, role: team lead}
+  - {id: REP-DANA, name: Dana Ortiz, role: business analyst, sme: true}
+  - {id: REP-OMAR, name: Omar, role: relationship manager}
+  - {id: REP-SAM, name: Sam, role: team lead}
+  - {id: REP-KAI, name: Kai Moreno, role: product specialist, sme: true}

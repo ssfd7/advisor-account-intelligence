@@ -1,6 +1,6 @@
 """Cited QBR brief: context bundle -> Claude (structured output) -> evidence verifier -> Markdown.
 
-The bundle is assembled from scoped, as-of queries (memory-architecture.md §8); every item carries an id. The model
+The bundle is assembled from scoped, as-of queries (architecture.md §7); every item carries an id. The model
 may only state what the bundle supports and must cite item ids. The verifier rejects uncited statements, unknown ids,
 actions that were not proposed, and money figures absent from the bundle, so a draft that fails never reaches a reviewer.
 """
@@ -31,7 +31,7 @@ def bundle(g: Graph, roster: Roster, user: str, firm: str, advisor: str, at: dat
         items[f"QUAL-{n}"] = {"type": "qualification", **{k: str(v) for k, v in x.items()}}
     for n, x in enumerate(p["gaps"], 1):
         items[f"GAP-{n}"] = {"type": "gap", "text": x}
-    for prod in ("CUST-A", "SVC-A", "SVC-B"):
+    for prod in ("CCC", "CMP", "CPX-UMA"):
         s = q.product_state(g, roster, user, firm, prod, at, at)
         if s["history"]:
             top = s["history"][0]
@@ -55,8 +55,8 @@ def bundle(g: Graph, roster: Roster, user: str, firm: str, advisor: str, at: dat
     rule = q.combine_assets(obs)
     items["ASSET-RULE"] = {"type": "rule", "text": "Totals or shares not allowed: " + "; ".join(rule.get("reasons", []))
                            if not rule["allowed"] else "Observations are comparable"}
-    cap = q.capability(g, "SVC-B", "integration")
-    items["CAP-SVC-B-INTEGRATION"] = {"type": "catalog check", "product": "SVC-B", "query": "portfolio accounting integration",
+    cap = q.capability(g, "CPX-UMA", "integration")
+    items["CAP-UMA-INTEGRATION"] = {"type": "catalog check", "product": "CPX-UMA", "query": "portfolio accounting integration",
                                       "status": cap["status"]}
     for pq in g.run("""MATCH (o:ProductOffering)-[:hasPrerequisite]->(p:Prerequisite)
                        OPTIONAL MATCH (p)-[:evidencedBy]->(s:SourceRecord)
@@ -66,8 +66,25 @@ def bundle(g: Graph, roster: Roster, user: str, firm: str, advisor: str, at: dat
     for a in proposals:
         items[a["id"]] = {"type": "proposed action", "title": a["title"], "product": a["product"],
                           "addresses": [x[1] for x in a["addresses"]], "requires": a["requires"], "fulfils": a["fulfils"],
-                          "due": str(a["due"])}
+                          "due": str(a["due"]), "status": a.get("status", "proposed"), "note": a.get("note")}
     return items
+
+
+def one_page(items: dict, firm_name: str, at: date) -> list:
+    """The rep's page without a model: what the advisor uses, said, wants, and what we still owe them, each line cited."""
+    by = lambda kind: [(k, v) for k, v in items.items() if v["type"] == kind]
+    lines = [f"Brief for {items['ADVISOR']['name']}, {firm_name}, {at}"]
+    lines.append("Uses:  " + "; ".join(f"{v['product']} {v['state']} [{k}]" for k, v in by("product state")))
+    lines += [f"       discrepancy: {v['text']} [{k}]" for k, v in by("discrepancy")]
+    lines += [f"Said:  {v['summary']} ({v['affected']}, {v['evidence']} by {v['reported_by']}, {v['date']}"
+              + (f"; repeated in {', '.join(v['repeated_in'])}" if v["repeated_in"] else "") + f") [{k}]" for k, v in by("experience")]
+    lines += [f"Wants: {v['intent']} {v['target']}: {v['reason']} [{k}]" for k, v in by("current intent")]
+    lines += [f"Owe:   {v['summary']}, due {v['due']}, {v['status']} [{k}]" for k, v in by("commitment")]
+    lines += [f"Next:  {v['title']} ({v['status']}{': ' + v['note'] if v.get('note') else ''}) [{k}]" for k, v in by("proposed action")]
+    lines += [f"Check: {v['text']} [{k}]" for k, v in by("gap")]
+    lines += [f"Check: {v['product']} {v['query']}: {v['status']} in the catalog [{k}]" for k, v in by("catalog check")]
+    lines.append(f"Assets: {items['ASSET-RULE']['text']} [ASSET-RULE]")
+    return lines
 
 
 class Statement(BaseModel):
@@ -138,7 +155,7 @@ def _amounts(text: str) -> set:
 
 
 def verify(brief: Brief, items: dict) -> list:
-    """Evidence checks before a draft is shown (FR6, FR9): returns a list of problems; empty means accepted."""
+    """Evidence checks before a draft is shown: returns a list of problems; empty means accepted."""
     problems = []
     known_amounts = {round(float(v["value"])) for v in items.values() if v["type"] == "asset observation"}
     statements = [("headline", brief.headline)] + [(s.heading, st) for s in brief.sections for st in s.statements] + \

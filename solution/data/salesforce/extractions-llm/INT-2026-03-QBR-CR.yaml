@@ -3,23 +3,23 @@ extractor: claude-opus-5-5
 candidates:
 - id: LLM-INT-2026-03-QBR-CR-1
   kind: intent
-  span: Maya is postponing the Service B evaluation because the integration with her
+  span: Maya is postponing the CPX UMA evaluation because the integration with her
     portfolio accounting system has not been verified.
   speaker: ADV-001
   concept: postponing
-  target: SVC-B
+  target: CPX-UMA
   reason: the integration with her portfolio accounting system has not been verified
   blocker: PRQ-001
   proposes_state: paused
   alternatives: []
 - id: LLM-INT-2026-03-QBR-CR-2
   kind: experience
-  span: investors keep calling her team about the Service A quarterly statements
+  span: investors keep calling her team about the CMP quarterly statements
   speaker: ADV-001
-  product: SVC-A
+  product: CMP
   affected: investor group
   evidence_type: testimony
-  summary: Ongoing problems with Service A quarterly statements; investors keep calling
+  summary: Ongoing problems with CMP quarterly statements; investors keep calling
     the advisor's team about them.
 - id: LLM-INT-2026-03-QBR-CR-3
   kind: commitment_status
@@ -29,12 +29,12 @@ candidates:
   commitment: LLM-INT-2026-01-QBR-CR-5
   status: open
 unmapped:
-- Custody Service A remains in active use.
+- Crestline custody remains in active use.
 reviewer_notes:
-- '''Custody Service A remains in active use.'' is a status statement, not an experience
+- '''Crestline custody remains in active use.'' is a status statement, not an experience
   or intent; a ''using'' state cannot be proposed from a conversation and needs operational
   records.'
-- The Service A statements issue is recorded as Maya's testimony about investors;
+- The CMP statements issue is recorded as Maya's testimony about investors;
   the note does not quote her directly, so confirm attribution. The burden also falls
   on her advisor team (call volume).
 - The note says 'still a problem', implying an earlier report; the system should check

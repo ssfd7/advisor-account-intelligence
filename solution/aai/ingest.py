@@ -13,7 +13,8 @@ import yaml
 
 from . import DATA
 from .graph import Graph
-from .memory import add_state, product_relationship, promoter
+from .memory import add_state, product_relationship
+from .pipeline import add_asset_candidates, approve, draft, follow_up
 from .tasks import TaskStore
 
 CRM_STAGE = {"discovery": "evaluating", "pilot ready": "evaluating", "won": "using", "lost": "rejected"}
@@ -62,7 +63,7 @@ def load(g: Graph, store: TaskStore, data: Path = DATA, extractions: str = "extr
     for p in catalog["platforms"]:
         g.node("Platform", p["id"], name=p["name"])
     for o in catalog["offerings"]:
-        g.node("ProductOffering", o["id"], name=o["name"], productCategory=o["category"],
+        g.node("ProductOffering", o["id"], name=o["name"], productCategory=o["category"], alias=", ".join(o.get("aliases", [])),
                catalogVersion=catalog["catalog_version"], validFrom=o["valid_from"])
         g.link("Platform", o["platform"], "offers", "ProductOffering", o["id"])
         for c in o.get("capabilities", []):
@@ -97,7 +98,9 @@ def load(g: Graph, store: TaskStore, data: Path = DATA, extractions: str = "extr
                 report["identity"].append({"a": a["advisor_id"], "b": b["advisor_id"], "names": (a["full_name"], b["full_name"]),
                                            "similarity": round(ratio, 2), "same_crd": a["crd"] == b["crd"],
                                            "decision": "merged" if a["crd"] == b["crd"] else "kept separate; steward review suggested"})
+    firm_names = {}
     for f in rows(sf / "firms.csv"):
+        firm_names[f["firm_id"]] = f["legal_name"]
         g.node("Firm", f["firm_id"], name=f["legal_name"], secFileNumber=f["sec_file_number"], sourceRef=f"snowflake:firms:{f['firm_id']}")
     for r in rows(sf / "affiliations.csv"):
         g.node("Affiliation", r["affiliation_id"], role=r["role"], validFrom=d(r["valid_from"]), validTo=d(r["valid_to"]),
@@ -135,7 +138,8 @@ def load(g: Graph, store: TaskStore, data: Path = DATA, extractions: str = "extr
     for r in rows(sf / "asset_observations.csv"):
         oid = r["observation_id"]
         g.node("AssetObservation", oid, metricType=r["metric_type"], metricValue=float(r["value"]), currency=r["currency"],
-               scope=r["scope"], asOfDate=d(r["as_of_date"]), methodology=r["methodology"], recordedAt=d(r["recorded_at"]))
+               scope=r["scope"], asOfDate=d(r["as_of_date"]), methodology=r["methodology"], evidenceType="reported",
+               recordedAt=d(r["recorded_at"]))
         g.link("AssetObservation", oid, "measures", party_label(r["measured_party"]), r["measured_party"])
         g.link("AssetObservation", oid, "reportedBy", party_label(r["reporting_entity"]), r["reporting_entity"])
         if r["product_id"]:
@@ -149,7 +153,6 @@ def load(g: Graph, store: TaskStore, data: Path = DATA, extractions: str = "extr
     for path in sorted((crm / "interactions").glob("*.md")):
         meta, body = parse_interaction(path)
         interactions[meta["interaction_id"]], bodies[meta["interaction_id"]] = meta, body
-    promote = promoter(g, interactions)
     for iid, meta in sorted(interactions.items(), key=lambda kv: kv[1]["date"]):
         g.node("Interaction", iid, kind=meta["type"], interactionDate=meta["date"], recordedAt=meta["recorded_at"], path=meta["path"])
         g.link("Interaction", iid, "withParty", "Firm", meta["firm"])
@@ -158,8 +161,10 @@ def load(g: Graph, store: TaskStore, data: Path = DATA, extractions: str = "extr
         g.link("Interaction", iid, "ownedByTeam", "Team", meta["team"])
         store.save_interaction(iid, meta["team"], meta["author"], meta["recorded_at"])
         ext_path = crm / extractions / f"{iid}.yaml"
-        if not ext_path.exists():
-            continue  # extraction failed: the review item stays pending
+        if not ext_path.exists():  # extraction failed: the review item stays pending, with detection only
+            add_asset_candidates(g, store, meta, bodies[iid])
+            draft(store, store.roster, meta, bodies[iid], firm_names[meta["firm"]])
+            continue
         ext = yaml.safe_load(ext_path.read_text())
         for c in ext.get("candidates") or []:
             start = bodies[iid].find(c["span"])
@@ -183,10 +188,16 @@ def load(g: Graph, store: TaskStore, data: Path = DATA, extractions: str = "extr
             if payload.get("concept"):
                 payload["concept"] = concept_ids[payload["concept"]]
             store.add_candidate(c["id"], iid, c["kind"], payload, span_id, quoted)
+        add_asset_candidates(g, store, meta, bodies[iid])
         review = ext.get("review")
-        if review:
+        if review:  # historical SME approval and follow-up decisions recorded in the fixtures
             decisions = {c["id"]: "confirm" for c in store.candidates(iid, "candidate")}
-            store.resolve_review(review["by"], iid, d(str(review["at"])), decisions, promote)
+            approve(g, store, store.roster, interactions, bodies, firm_names, review["by"], iid, d(str(review["at"])), decisions)
+            if ext.get("follow_up"):
+                f = ext["follow_up"]
+                follow_up(g, store, f["by"], iid, d(str(f["at"])), f["approve"], f.get("dismiss_reason"))
+        else:
+            draft(store, store.roster, meta, bodies[iid], firm_names[meta["firm"]])
 
     # CRM opportunity stages, after the interactions they followed
     cv = version(crm / "crm_opportunities.csv")
@@ -195,6 +206,6 @@ def load(g: Graph, store: TaskStore, data: Path = DATA, extractions: str = "extr
         add_state(g, f"PSR:{r['opportunity_id']}", pr, CRM_STAGE[r["stage"]], "crm", d(r["stage_date"]), d(r["recorded_at"]),
                   (f"salesforce:opportunity:{r['opportunity_id']}", "salesforce", r["opportunity_id"], cv))
 
-    report["interactions"] = interactions
+    report["interactions"], report["bodies"], report["firm_names"] = interactions, bodies, firm_names
     report["counts"] = g.counts()
     return report

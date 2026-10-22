@@ -3,15 +3,19 @@ extractor: fixture-v1
 candidates:
   - id: CAND-NF-1
     kind: intent
-    span: May is exploring Managed Portfolio Service B for a new group of retirement clients.
+    span: May is exploring their UMA for a new group of retirement clients.
     concept: exploring or comparing
-    target: SVC-B
+    target: CPX-UMA
     alternatives: []
     speaker: ADV-002
     desired_outcome: Managed option for retirement clients
     reason: New client segment
     proposes_state: evaluating
 review:
-  by: REP-OMAR
+  by: REP-KAI
   at: 2026-03-12
   decision: confirmed
+follow_up:
+  by: REP-OMAR
+  at: 2026-03-12
+  approve: [intent]

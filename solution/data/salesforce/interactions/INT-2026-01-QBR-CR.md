@@ -10,10 +10,10 @@ advisor: ADV-001
 ---
 Quarterly review with Maya Chen, Cedar Ridge Advisory.
 
-Maya said her investors find the Managed Portfolio Service A statements difficult to understand, and her team spends hours each quarter explaining them.
+Maya said her investors find the Crestline Model Portfolios statements difficult to understand, and her team spends hours each quarter explaining them.
 
-She is considering Managed Portfolio Service B on Platform B and asked for a comparison of reporting and integration capabilities.
+She is considering the UMA on Crestline Portfolio Exchange and asked for a comparison of reporting and integration capabilities.
 
-Custody with Platform A is working well and is not under review.
+Custody with Crestline is working well and is not under review.
 
 I promised to arrange a session with a product specialist on reporting and integration.

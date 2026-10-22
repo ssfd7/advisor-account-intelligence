@@ -10,4 +10,6 @@ advisor: ADV-002
 ---
 Quarterly review with May Chen, Northfield Wealth Partners.
 
-May is exploring Managed Portfolio Service B for a new group of retirement clients.
+May is exploring their UMA for a new group of retirement clients.
+
+She also asked whether we offer separate accounts for her larger clients.

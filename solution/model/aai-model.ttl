@@ -15,10 +15,10 @@
 <https://w3id.org/aai/ontology> a owl:Ontology ;
     dcterms:title "Advisor Account Intelligence ontology"@en ;
     dcterms:description "Structural semantic model of advisors, firms, platforms, product relationships, QBR interactions, experience, intent and team-owned follow-up work. Formal counterpart of aai-model.drawio."@en ;
-    dcterms:created "2026-10-19"^^xsd:date ;
-    dcterms:modified "2026-10-19"^^xsd:date ;
-    owl:versionInfo "0.1" ;
-    owl:versionIRI <https://w3id.org/aai/ontology/0.1> ;
+    dcterms:created "2026-10-21"^^xsd:date ;
+    dcterms:modified "2026-10-21"^^xsd:date ;
+    owl:versionInfo "0.2" ;
+    owl:versionIRI <https://w3id.org/aai/ontology/0.2> ;
     vann:preferredNamespacePrefix "aai" ;
     vann:preferredNamespaceUri "https://w3id.org/aai/ontology#" .
 
@@ -194,6 +194,22 @@ aai:Coverage a owl:Class ;
     rdfs:label "Coverage"@en ;
     skos:definition "A dated arrangement in which one rep covers for another who is unavailable or has left."@en .
 
+aai:SemanticQBR a owl:Class ;
+    rdfs:label "Semantic QBR"@en ;
+    skos:definition "A structured reading of one interaction: its product mentions, asset figures and candidate findings, each tied to its source span. A draft until a subject-matter expert approves it; only approved findings enter memory."@en .
+
+aai:ProductMention a owl:Class ;
+    rdfs:label "Product Mention"@en ;
+    skos:definition "A phrase in a source span that names a product offering, linked to the catalog by name or alias, or left unresolved for review."@en .
+
+aai:Procedure a owl:Class ;
+    rdfs:label "Procedure"@en ;
+    skos:definition "An approved, versioned way of working, with ordered steps each performed by an agent or a person."@en .
+
+aai:ProcedureRun a owl:Class ;
+    rdfs:label "Procedure Run"@en ;
+    skos:definition "One execution of a procedure, started by an approved semantic QBR, whose steps are bound to findings, owners and due dates."@en .
+
 aai:Advisor owl:disjointWith aai:Firm .
 aai:Rep owl:disjointWith aai:Party .
 
@@ -359,9 +375,9 @@ aai:affects a owl:ObjectProperty ;
 
 aai:supportedBy a owl:ObjectProperty ;
     rdfs:label "supportedBy"@en ;
-    rdfs:domain [ a owl:Class ; owl:unionOf ( aai:ExperienceObservation aai:Intent ) ] ;
+    rdfs:domain [ a owl:Class ; owl:unionOf ( aai:AssetObservation aai:ExperienceObservation aai:Intent ) ] ;
     rdfs:range aai:SourceSpan ;
-    skos:definition "Links an extracted observation or intent to the source span that supports it."@en .
+    skos:definition "Links an extracted observation, intent or asset figure to the source span that supports it."@en .
 
 aai:expressedBy a owl:ObjectProperty ;
     rdfs:label "expressedBy"@en ;
@@ -437,9 +453,9 @@ aai:createdBy a owl:ObjectProperty , owl:FunctionalProperty ;
 
 aai:approvedBy a owl:ObjectProperty ;
     rdfs:label "approvedBy"@en ;
-    rdfs:domain aai:Action ;
+    rdfs:domain [ a owl:Class ; owl:unionOf ( aai:Action aai:SemanticQBR ) ] ;
     rdfs:range aai:Rep ;
-    skos:definition "Links an action to the rep who approved it."@en .
+    skos:definition "Links an action or semantic QBR to the rep who approved it."@en .
 
 aai:madeBy a owl:ObjectProperty ;
     rdfs:label "madeBy"@en ;
@@ -483,6 +499,48 @@ aai:coveredBy a owl:ObjectProperty , owl:FunctionalProperty ;
     rdfs:range aai:Rep ;
     skos:definition "Links a coverage arrangement to the rep who covers."@en .
 
+aai:interprets a owl:ObjectProperty , owl:FunctionalProperty ;
+    rdfs:label "interprets"@en ;
+    rdfs:domain aai:SemanticQBR ;
+    rdfs:range aai:Interaction ;
+    skos:definition "Links a semantic QBR to the interaction it reads."@en .
+
+aai:contains a owl:ObjectProperty ;
+    rdfs:label "contains"@en ;
+    rdfs:domain aai:SemanticQBR ;
+    rdfs:range aai:ProductMention ;
+    skos:definition "Links a semantic QBR to a product mention detected in it."@en .
+
+aai:foundIn a owl:ObjectProperty , owl:FunctionalProperty ;
+    rdfs:label "foundIn"@en ;
+    rdfs:domain aai:ProductMention ;
+    rdfs:range aai:SourceSpan ;
+    skos:definition "Links a product mention to the source span that contains it."@en .
+
+aai:refersTo a owl:ObjectProperty ;
+    rdfs:label "refersTo"@en ;
+    rdfs:domain aai:ProductMention ;
+    rdfs:range aai:ProductOffering ;
+    skos:definition "Links a product mention to the catalog offering it names. Absent when the mention is unresolved."@en .
+
+aai:follows a owl:ObjectProperty , owl:FunctionalProperty ;
+    rdfs:label "follows"@en ;
+    rdfs:domain aai:ProcedureRun ;
+    rdfs:range aai:Procedure ;
+    skos:definition "Links a procedure run to the procedure version it executes."@en .
+
+aai:startedBy a owl:ObjectProperty , owl:FunctionalProperty ;
+    rdfs:label "startedBy"@en ;
+    rdfs:domain aai:ProcedureRun ;
+    rdfs:range aai:SemanticQBR ;
+    skos:definition "Links a procedure run to the approved semantic QBR that started it."@en .
+
+aai:partOfRun a owl:ObjectProperty ;
+    rdfs:label "partOfRun"@en ;
+    rdfs:domain aai:Action ;
+    rdfs:range aai:ProcedureRun ;
+    skos:definition "Links an action to the procedure run whose step it carries out."@en .
+
 #################################################################
 # Data properties (attributes; not on the diagram)
 #################################################################
@@ -501,7 +559,7 @@ aai:validTo a owl:DatatypeProperty ;
 
 aai:recordedAt a owl:DatatypeProperty ;
     rdfs:label "recordedAt"@en ;
-    rdfs:domain [ a owl:Class ; owl:unionOf ( aai:Action aai:Affiliation aai:AssetObservation aai:Commitment aai:ExperienceObservation aai:Intent aai:PlatformRelationship aai:ProductStateRecord aai:Qualification aai:Registration ) ] ;
+    rdfs:domain [ a owl:Class ; owl:unionOf ( aai:Action aai:Affiliation aai:AssetObservation aai:Commitment aai:ExperienceObservation aai:Intent aai:PlatformRelationship aai:ProductStateRecord aai:Qualification aai:Registration aai:SemanticQBR ) ] ;
     rdfs:range xsd:dateTime ;
     skos:definition "When the system learned the fact (recorded time). As-of answers exclude facts recorded later."@en .
 
@@ -603,7 +661,7 @@ aai:registrationStatus a owl:DatatypeProperty ;
 
 aai:evidenceType a owl:DatatypeProperty ;
     rdfs:label "evidenceType"@en ;
-    rdfs:domain aai:ExperienceObservation ;
+    rdfs:domain [ a owl:Class ; owl:unionOf ( aai:AssetObservation aai:ExperienceObservation ) ] ;
     rdfs:range xsd:string ;
     skos:definition "Testimony or measured evidence."@en .
 
@@ -621,7 +679,7 @@ aai:reasonOrBlocker a owl:DatatypeProperty ;
 
 aai:dueDate a owl:DatatypeProperty ;
     rdfs:label "dueDate"@en ;
-    rdfs:domain [ a owl:Class ; owl:unionOf ( aai:Action aai:Commitment ) ] ;
+    rdfs:domain [ a owl:Class ; owl:unionOf ( aai:Action aai:Commitment aai:SemanticQBR ) ] ;
     rdfs:range xsd:date ;
     skos:definition "Date by which the work is due."@en .
 
@@ -660,6 +718,36 @@ aai:conceptId a owl:DatatypeProperty ;
     rdfs:domain aai:IntentConcept ;
     rdfs:range xsd:string ;
     skos:definition "Stable identifier of the taxonomy concept."@en .
+
+aai:alias a owl:DatatypeProperty ;
+    rdfs:label "alias"@en ;
+    rdfs:domain [ a owl:Class ; owl:unionOf ( aai:Platform aai:ProductOffering ) ] ;
+    rdfs:range xsd:string ;
+    skos:definition "Another name for the offering or platform used by advisors or staff, approved in the catalog."@en .
+
+aai:approvalStatus a owl:DatatypeProperty ;
+    rdfs:label "approvalStatus"@en ;
+    rdfs:domain aai:SemanticQBR ;
+    rdfs:range xsd:string ;
+    skos:definition "Draft, verified or rejected. Only a person sets verified."@en .
+
+aai:phrase a owl:DatatypeProperty ;
+    rdfs:label "phrase"@en ;
+    rdfs:domain aai:ProductMention ;
+    rdfs:range xsd:string ;
+    skos:definition "The words in the source that name the product."@en .
+
+aai:linkMethod a owl:DatatypeProperty ;
+    rdfs:label "linkMethod"@en ;
+    rdfs:domain aai:ProductMention ;
+    rdfs:range xsd:string ;
+    skos:definition "How the mention was linked: catalog name, alias, or unresolved."@en .
+
+aai:procedureVersion a owl:DatatypeProperty ;
+    rdfs:label "procedureVersion"@en ;
+    rdfs:domain aai:Procedure ;
+    rdfs:range xsd:string ;
+    skos:definition "Approved version of the procedure."@en .
 
 #################################################################
 # Code lists
@@ -766,3 +854,133 @@ aai:IntentConcept_unknown a aai:IntentConcept ;
     aai:conceptId "INT-07" ;
     aai:inTaxonomy aai:IntentTaxonomyV1 ;
     skos:inScheme aai:IntentTaxonomyV1 .
+
+#################################################################
+# Steward and lifecycle status (all terms proposed in v0.2)
+#################################################################
+
+aai:Party aai:steward "Data stewardship" ; aai:termStatus "proposed" .
+aai:Advisor aai:steward "Data stewardship" ; aai:termStatus "proposed" .
+aai:Firm aai:steward "Data stewardship" ; aai:termStatus "proposed" .
+aai:Platform aai:steward "Data stewardship" ; aai:termStatus "proposed" .
+aai:Affiliation aai:steward "Data stewardship" ; aai:termStatus "proposed" .
+aai:Qualification aai:steward "Data stewardship" ; aai:termStatus "proposed" .
+aai:Registration aai:steward "Data stewardship" ; aai:termStatus "proposed" .
+aai:PlatformRelationship aai:steward "Product specialists" ; aai:termStatus "proposed" .
+aai:ProductOffering aai:steward "Product specialists" ; aai:termStatus "proposed" .
+aai:Capability aai:steward "Product specialists" ; aai:termStatus "proposed" .
+aai:Prerequisite aai:steward "Product specialists" ; aai:termStatus "proposed" .
+aai:ProductRelationship aai:steward "Product specialists" ; aai:termStatus "proposed" .
+aai:ProductStateRecord aai:steward "Product specialists" ; aai:termStatus "proposed" .
+aai:ProductState aai:steward "Business analysis" ; aai:termStatus "proposed" .
+aai:Discrepancy aai:steward "Data stewardship" ; aai:termStatus "proposed" .
+aai:AssetObservation aai:steward "Data stewardship" ; aai:termStatus "proposed" .
+aai:MetricType aai:steward "Business analysis" ; aai:termStatus "proposed" .
+aai:SourceRecord aai:steward "Data stewardship" ; aai:termStatus "proposed" .
+aai:Interaction aai:steward "Business analysis" ; aai:termStatus "proposed" .
+aai:QBRInteraction aai:steward "Business analysis" ; aai:termStatus "proposed" .
+aai:EmailMessage aai:steward "Business analysis" ; aai:termStatus "proposed" .
+aai:SourceSpan aai:steward "Data stewardship" ; aai:termStatus "proposed" .
+aai:ExperienceObservation aai:steward "Business analysis" ; aai:termStatus "proposed" .
+aai:AffectedGroup aai:steward "Business analysis" ; aai:termStatus "proposed" .
+aai:Intent aai:steward "Business analysis" ; aai:termStatus "proposed" .
+aai:IntentConcept aai:steward "Business analysis" ; aai:termStatus "proposed" .
+aai:TaxonomyVersion aai:steward "Business analysis" ; aai:termStatus "proposed" .
+aai:Commitment aai:steward "Business analysis" ; aai:termStatus "proposed" .
+aai:Action aai:steward "Relationship team leads" ; aai:termStatus "proposed" .
+aai:Rep aai:steward "Relationship team leads" ; aai:termStatus "proposed" .
+aai:Team aai:steward "Relationship team leads" ; aai:termStatus "proposed" .
+aai:Assignment aai:steward "Relationship team leads" ; aai:termStatus "proposed" .
+aai:Coverage aai:steward "Relationship team leads" ; aai:termStatus "proposed" .
+aai:SemanticQBR aai:steward "Business analysis" ; aai:termStatus "proposed" .
+aai:ProductMention aai:steward "Data stewardship" ; aai:termStatus "proposed" .
+aai:Procedure aai:steward "Relationship team leads" ; aai:termStatus "proposed" .
+aai:ProcedureRun aai:steward "Relationship team leads" ; aai:termStatus "proposed" .
+aai:ofAdvisor aai:steward "Data stewardship" ; aai:termStatus "proposed" .
+aai:withFirm aai:steward "Data stewardship" ; aai:termStatus "proposed" .
+aai:heldBy aai:steward "Data stewardship" ; aai:termStatus "proposed" .
+aai:registers aai:steward "Data stewardship" ; aai:termStatus "proposed" .
+aai:ofParty aai:steward "Data stewardship" ; aai:termStatus "proposed" .
+aai:withPlatform aai:steward "Data stewardship" ; aai:termStatus "proposed" .
+aai:evidencedBy aai:steward "Data stewardship" ; aai:termStatus "proposed" .
+aai:offers aai:steward "Data stewardship" ; aai:termStatus "proposed" .
+aai:hasCapability aai:steward "Data stewardship" ; aai:termStatus "proposed" .
+aai:hasPrerequisite aai:steward "Data stewardship" ; aai:termStatus "proposed" .
+aai:hasProductRelationship aai:steward "Data stewardship" ; aai:termStatus "proposed" .
+aai:forProduct aai:steward "Data stewardship" ; aai:termStatus "proposed" .
+aai:stateOf aai:steward "Data stewardship" ; aai:termStatus "proposed" .
+aai:hasState aai:steward "Data stewardship" ; aai:termStatus "proposed" .
+aai:supersedes aai:steward "Data stewardship" ; aai:termStatus "proposed" .
+aai:involves aai:steward "Data stewardship" ; aai:termStatus "proposed" .
+aai:measures aai:steward "Data stewardship" ; aai:termStatus "proposed" .
+aai:reportedBy aai:steward "Data stewardship" ; aai:termStatus "proposed" .
+aai:hasMetricType aai:steward "Data stewardship" ; aai:termStatus "proposed" .
+aai:withParty aai:steward "Data stewardship" ; aai:termStatus "proposed" .
+aai:partOf aai:steward "Data stewardship" ; aai:termStatus "proposed" .
+aai:quotes aai:steward "Data stewardship" ; aai:termStatus "proposed" .
+aai:records aai:steward "Data stewardship" ; aai:termStatus "proposed" .
+aai:expresses aai:steward "Data stewardship" ; aai:termStatus "proposed" .
+aai:concerns aai:steward "Data stewardship" ; aai:termStatus "proposed" .
+aai:affects aai:steward "Data stewardship" ; aai:termStatus "proposed" .
+aai:supportedBy aai:steward "Data stewardship" ; aai:termStatus "proposed" .
+aai:expressedBy aai:steward "Data stewardship" ; aai:termStatus "proposed" .
+aai:targets aai:steward "Data stewardship" ; aai:termStatus "proposed" .
+aai:considersAlternative aai:steward "Data stewardship" ; aai:termStatus "proposed" .
+aai:classifiedAs aai:steward "Data stewardship" ; aai:termStatus "proposed" .
+aai:inTaxonomy aai:steward "Data stewardship" ; aai:termStatus "proposed" .
+aai:ownedByTeam aai:steward "Data stewardship" ; aai:termStatus "proposed" .
+aai:authoredBy aai:steward "Data stewardship" ; aai:termStatus "proposed" .
+aai:arisesFrom aai:steward "Data stewardship" ; aai:termStatus "proposed" .
+aai:addresses aai:steward "Data stewardship" ; aai:termStatus "proposed" .
+aai:fulfils aai:steward "Data stewardship" ; aai:termStatus "proposed" .
+aai:requires aai:steward "Data stewardship" ; aai:termStatus "proposed" .
+aai:createdBy aai:steward "Data stewardship" ; aai:termStatus "proposed" .
+aai:approvedBy aai:steward "Data stewardship" ; aai:termStatus "proposed" .
+aai:madeBy aai:steward "Data stewardship" ; aai:termStatus "proposed" .
+aai:memberOf aai:steward "Data stewardship" ; aai:termStatus "proposed" .
+aai:ledBy aai:steward "Data stewardship" ; aai:termStatus "proposed" .
+aai:assignsWork aai:steward "Data stewardship" ; aai:termStatus "proposed" .
+aai:assignedTo aai:steward "Data stewardship" ; aai:termStatus "proposed" .
+aai:coversFor aai:steward "Data stewardship" ; aai:termStatus "proposed" .
+aai:coveredBy aai:steward "Data stewardship" ; aai:termStatus "proposed" .
+aai:interprets aai:steward "Data stewardship" ; aai:termStatus "proposed" .
+aai:contains aai:steward "Data stewardship" ; aai:termStatus "proposed" .
+aai:foundIn aai:steward "Data stewardship" ; aai:termStatus "proposed" .
+aai:refersTo aai:steward "Data stewardship" ; aai:termStatus "proposed" .
+aai:follows aai:steward "Data stewardship" ; aai:termStatus "proposed" .
+aai:startedBy aai:steward "Data stewardship" ; aai:termStatus "proposed" .
+aai:partOfRun aai:steward "Data stewardship" ; aai:termStatus "proposed" .
+aai:validFrom aai:steward "Data stewardship" ; aai:termStatus "proposed" .
+aai:validTo aai:steward "Data stewardship" ; aai:termStatus "proposed" .
+aai:recordedAt aai:steward "Data stewardship" ; aai:termStatus "proposed" .
+aai:verificationState aai:steward "Data stewardship" ; aai:termStatus "proposed" .
+aai:sourceSystem aai:steward "Data stewardship" ; aai:termStatus "proposed" .
+aai:sourceRecordId aai:steward "Data stewardship" ; aai:termStatus "proposed" .
+aai:importVersion aai:steward "Data stewardship" ; aai:termStatus "proposed" .
+aai:spanText aai:steward "Data stewardship" ; aai:termStatus "proposed" .
+aai:startOffset aai:steward "Data stewardship" ; aai:termStatus "proposed" .
+aai:endOffset aai:steward "Data stewardship" ; aai:termStatus "proposed" .
+aai:interactionDate aai:steward "Data stewardship" ; aai:termStatus "proposed" .
+aai:reviewDeadline aai:steward "Data stewardship" ; aai:termStatus "proposed" .
+aai:reviewStatus aai:steward "Data stewardship" ; aai:termStatus "proposed" .
+aai:metricValue aai:steward "Data stewardship" ; aai:termStatus "proposed" .
+aai:currency aai:steward "Data stewardship" ; aai:termStatus "proposed" .
+aai:asOfDate aai:steward "Data stewardship" ; aai:termStatus "proposed" .
+aai:methodology aai:steward "Data stewardship" ; aai:termStatus "proposed" .
+aai:examName aai:steward "Data stewardship" ; aai:termStatus "proposed" .
+aai:registrationStatus aai:steward "Data stewardship" ; aai:termStatus "proposed" .
+aai:evidenceType aai:steward "Data stewardship" ; aai:termStatus "proposed" .
+aai:desiredOutcome aai:steward "Data stewardship" ; aai:termStatus "proposed" .
+aai:reasonOrBlocker aai:steward "Data stewardship" ; aai:termStatus "proposed" .
+aai:dueDate aai:steward "Data stewardship" ; aai:termStatus "proposed" .
+aai:actionStatus aai:steward "Data stewardship" ; aai:termStatus "proposed" .
+aai:dispositionReason aai:steward "Data stewardship" ; aai:termStatus "proposed" .
+aai:acknowledgedAt aai:steward "Data stewardship" ; aai:termStatus "proposed" .
+aai:productCategory aai:steward "Data stewardship" ; aai:termStatus "proposed" .
+aai:catalogVersion aai:steward "Data stewardship" ; aai:termStatus "proposed" .
+aai:conceptId aai:steward "Data stewardship" ; aai:termStatus "proposed" .
+aai:alias aai:steward "Data stewardship" ; aai:termStatus "proposed" .
+aai:approvalStatus aai:steward "Data stewardship" ; aai:termStatus "proposed" .
+aai:phrase aai:steward "Data stewardship" ; aai:termStatus "proposed" .
+aai:linkMethod aai:steward "Data stewardship" ; aai:termStatus "proposed" .
+aai:procedureVersion aai:steward "Data stewardship" ; aai:termStatus "proposed" .

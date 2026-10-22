@@ -55,7 +55,6 @@ check(overview[1] == union_r, f"overview relationships differ from union: {overv
 
 g = Graph()
 g.parse(MODEL / "aai-model.ttl")
-g.parse(MODEL / "aai-governance.ttl")
 labels = {str(o): s for s, o in g.subject_objects(RDFS.label)}
 classes = {str(g.value(c, RDFS.label)) for c in g.subjects(RDF.type, OWL.Class) if str(c).startswith(str(AAI))}
 check(classes == overview[0], f"Turtle classes differ from overview: {classes ^ overview[0]}")

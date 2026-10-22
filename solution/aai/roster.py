@@ -12,6 +12,8 @@ class Team:
     id: str
     name: str
     lead: str
+    owner: str
+    sme: str
     members: list
     relationships: list
     review_days: int
@@ -22,6 +24,8 @@ class Roster:
         raw = yaml.safe_load(Path(path).read_text())
         self.teams = {t["id"]: Team(**t) for t in raw["teams"]}
         self.reps = {r["id"]: r["name"] for r in raw["reps"]}
+        self.roles = {r["id"]: r["role"] for r in raw["reps"]}
+        self.smes = {r["id"] for r in raw["reps"] if r.get("sme")}
 
     def teams_of(self, rep: str) -> list:
         return [t for t in self.teams.values() if rep in t.members]

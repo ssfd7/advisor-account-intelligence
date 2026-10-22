@@ -1,4 +1,4 @@
-"""Promotion of validated takeaways into graph memory (memory-architecture.md §5–6).
+"""Promotion of validated takeaways into graph memory (architecture.md §3).
 
 - valid time is when the statement was made; recorded time is when a reviewer confirmed it;
 - supersession is scoped to the same speaker and product target;
@@ -86,6 +86,13 @@ def promoter(g: Graph, interactions: dict):
             g.node("Commitment", cand["id"], summary=p.get("summary") or "", dueDate=date.fromisoformat(str(p["due"])) if p.get("due") else None, status="open", recordedAt=at)
             g.link("Interaction", iid, "records", "Commitment", cand["id"])
             g.link("Commitment", cand["id"], "madeBy", "Rep", p.get("made_by") or meta["author"])
+        elif kind == "asset":  # an asset figure the advisor stated: testimony at its stated scope, never the firm's report
+            g.node("AssetObservation", cand["id"], metricType=p["metric"], metricValue=float(p["value"]), currency=p["currency"],
+                   scope=p["scope"], asOfDate=valid, methodology="stated by the advisor in a QBR", evidenceType="testimony",
+                   recordedAt=at)
+            g.link("AssetObservation", cand["id"], "measures", "Firm", meta["firm"])
+            g.link("AssetObservation", cand["id"], "reportedBy", "Advisor", p["speaker"])
+            g.link("AssetObservation", cand["id"], "supportedBy", "SourceSpan", cand["span_id"])
         elif kind == "commitment_status":
             g.run("MATCH (c:Commitment {id: $id}) SET c.status = $s", id=p["commitment"], s=p["status"])
 
@@ -93,14 +100,17 @@ def promoter(g: Graph, interactions: dict):
 
 
 def write_action(g: Graph):
-    def write(action: dict, approver: str, at: date):
-        g.node("Action", action["id"], title=action["title"], actionStatus="approved", dueDate=action["due"], recordedAt=at)
+    def write(action: dict, approver: str, at: date, run_id: str = None):
+        due = action["due"] if isinstance(action["due"], date) else date.fromisoformat(str(action["due"]))
+        g.node("Action", action["id"], title=action["title"], actionStatus="approved", dueDate=due, recordedAt=at)
+        if run_id:
+            g.link("Action", action["id"], "partOfRun", "ProcedureRun", run_id)
         g.link("Action", action["id"], "arisesFrom", "Interaction", action["interaction_id"])
         g.link("Action", action["id"], "ownedByTeam", "Team", action["team"])
         g.link("Action", action["id"], "createdBy", "Rep", action["created_by"])
         g.link("Action", action["id"], "approvedBy", "Rep", approver)
         g.link("Action", action["id"], "concerns", "ProductOffering", action["product"])
-        for label, oid in action["addresses"]:
+        for label, oid in action["addresses"]:  # pairs, or lists after a JSON round trip
             g.link("Action", action["id"], "addresses", label, oid)
         for prq in action.get("requires", []):
             g.link("Action", action["id"], "requires", "Prerequisite", prq)

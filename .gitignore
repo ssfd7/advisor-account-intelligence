@@ -14,3 +14,6 @@ solution/.data/
 
 # Personal scratch files
 work/
+
+# Local secrets
+.env

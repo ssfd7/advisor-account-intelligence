@@ -10,10 +10,12 @@ advisor: ADV-001
 ---
 Quarterly review with Maya Chen, Cedar Ridge Advisory.
 
-Maya is postponing the Service B evaluation because the integration with her portfolio accounting system has not been verified.
+Maya is postponing the CPX UMA evaluation because the integration with her portfolio accounting system has not been verified.
 
-Statements are still a problem: investors keep calling her team about the Service A quarterly statements.
+Statements are still a problem: investors keep calling her team about the CMP quarterly statements.
 
-Custody Service A remains in active use.
+Crestline custody remains in active use.
 
 The specialist session promised in January has not happened yet.
+
+Maya said Cedar Ridge's AUM is now about $320 million across all custodians.

@@ -3,21 +3,21 @@ extractor: claude-opus-5-5
 candidates:
 - id: LLM-INT-2026-02-EMAIL-CR-1
   kind: experience
-  span: Maya said her investors find the Managed Portfolio Service A statements difficult
+  span: Maya said her investors find the Crestline Model Portfolios statements difficult
     to understand
   speaker: ADV-001
-  product: SVC-A
+  product: CMP
   affected: investor group
   evidence_type: testimony
-  summary: Advisor reports her investors find SVC-A statements difficult to understand.
+  summary: Advisor reports her investors find CMP statements difficult to understand.
 - id: LLM-INT-2026-02-EMAIL-CR-2
   kind: experience
   span: her team spends hours each quarter explaining them
   speaker: ADV-001
-  product: SVC-A
+  product: CMP
   affected: advisor team
   evidence_type: testimony
-  summary: Advisor reports her team spends hours each quarter explaining SVC-A statements
+  summary: Advisor reports her team spends hours each quarter explaining CMP statements
     to investors.
 - id: LLM-INT-2026-02-EMAIL-CR-3
   kind: commitment_status
@@ -30,7 +30,7 @@ candidates:
 unmapped:
 - Can someone from reporting join? Dates to follow.
 reviewer_notes:
-- The note forwards January QBR notes; the SVC-A statement experiences are likely
+- The note forwards January QBR notes; the CMP statement experiences are likely
   repetitions of earlier extracted takeaways.
 - Commitment LLM-INT-2026-01-QBR-CR-5 appears in progress (session being arranged,
   'Dates to follow'), so it is recorded as open, not done.

@@ -1,7 +1,7 @@
 """Answers to the competency questions, scoped to what the requesting rep may see.
 
 `valid_at` is the date the answer is about; `known_at` is the latest recorded time allowed, so an as-of answer
-excludes facts learned later (FR5).
+excludes facts learned later.
 """
 from datetime import date
 
@@ -77,7 +77,7 @@ def assets(g: Graph, roster: Roster, user: str, party: str, known_at: date) -> l
 
 
 def combine_assets(observations: list) -> dict:
-    """Totals or shares are allowed only when metric type, scope, currency and as-of date all match (FR3)."""
+    """Totals or shares are allowed only when metric type, scope, currency and as-of date all match."""
     reasons = []
     for key, label in (("metric", "metric types"), ("scope", "scopes"), ("currency", "currencies"), ("asOf", "as-of dates")):
         values = {o[key] for o in observations}
@@ -89,7 +89,7 @@ def combine_assets(observations: list) -> dict:
 
 
 def capability(g: Graph, product: str, text: str) -> dict:
-    """Catalog-grounded capability lookup: undocumented means unknown, never absent or present (FR9)."""
+    """Catalog-grounded capability lookup: undocumented means unknown, never absent or present."""
     found = g.run("""MATCH (:ProductOffering {id: $p})-[:hasCapability]->(c:Capability)
                      WHERE lower(c.name) CONTAINS lower($t) RETURN c.name AS name, c.catalogVersion AS version""", p=product, t=text)
     return {"product": product, "query": text, "status": "documented" if found else "unknown", "matches": found}
@@ -124,7 +124,7 @@ def intents(g: Graph, roster: Roster, user: str, firm: str, valid_at: date, know
                           (n)-[:classifiedAs]->(c:IntentConcept)
                     WHERE n.validFrom <= $va AND n.recordedAt <= $ka
                     OPTIONAL MATCH (n)-[:considersAlternative]->(alt:ProductOffering)
-                    RETURN n.id AS id, o.name AS target, c.label AS intent, n.reasonOrBlocker AS reason, n.validFrom AS date,
+                    RETURN n.id AS id, o.id AS targetId, o.name AS target, c.label AS intent, n.reasonOrBlocker AS reason, n.validFrom AS date,
                            collect(alt.name) AS alternatives ORDER BY date""", f=firm, va=valid_at, ka=known_at)
     current = {}
     for r in rows:
@@ -152,25 +152,26 @@ def propose_actions(g: Graph, roster: Roster, user: str, firm: str, interaction:
     Never proposes adoption of a product whose current intent is postponing or rejecting."""
     _check(roster, user, firm)
     team = roster.team_for_party(firm).id
-    proposals = []
-    for e in g.run("""MATCH (e:ExperienceObservation)-[:concerns]->(o:ProductOffering), (e)-[:supportedBy]->(s:SourceSpan),
-                            (i:Interaction {id: $iid})-[:records]->(e)
-                      RETURN e.id AS id, o.id AS product, o.name AS name, e.summary AS summary, s.id AS span""", iid=interaction):
-        proposals.append({"id": f"ACT:{e['id']}", "interaction_id": interaction, "team": team, "created_by": user,
-                          "title": f"Open service issue: {e['summary']} ({e['name']})", "product": e["product"],
-                          "addresses": [("ExperienceObservation", e["id"])], "sources": [e["span"]], "requires": [],
-                          "fulfils": [], "due": date.fromordinal(at.toordinal() + 14)})
+    proposals = []  # intents first: a product decision always gets a slot
     for n in g.run("""MATCH (i:Interaction {id: $iid})-[:expresses]->(n:Intent)-[:targets]->(o:ProductOffering),
                             (n)-[:classifiedAs]->(c:IntentConcept), (n)-[:supportedBy]->(s:SourceSpan)
                       OPTIONAL MATCH (o)-[:hasPrerequisite]->(q:Prerequisite)
                       RETURN n.id AS id, o.id AS product, o.name AS name, c.label AS intent, s.id AS span, collect(q.id) AS prereqs""",
                    iid=interaction):
         open_commitments = [c["id"] for c in commitments(g, roster, user, firm, at) if c["status"] == "open"]
-        if n["intent"] in ("postponing", "rejecting or discontinuing"):
-            title = f"Reporting-and-integration review with a product specialist ({n['name']}); verify prerequisites before any evaluation resumes"
-        else:
+        promotes = n["intent"] not in ("postponing", "rejecting or discontinuing")
+        if promotes:
             title = f"Supported comparison of {n['name']} against current services"
+        else:
+            title = f"Reporting-and-integration review with a product specialist ({n['name']}); verify prerequisites before any evaluation resumes"
         proposals.append({"id": f"ACT:{n['id']}", "interaction_id": interaction, "team": team, "created_by": user,
-                          "title": title, "product": n["product"], "addresses": [("Intent", n["id"])], "sources": [n["span"]],
+                          "title": title, "product": n["product"], "promotes": promotes, "addresses": [("Intent", n["id"])], "sources": [n["span"]],
                           "requires": n["prereqs"], "fulfils": open_commitments, "due": date.fromordinal(at.toordinal() + 21)})
+    for e in g.run("""MATCH (e:ExperienceObservation)-[:concerns]->(o:ProductOffering), (e)-[:supportedBy]->(s:SourceSpan),
+                            (i:Interaction {id: $iid})-[:records]->(e)
+                      RETURN e.id AS id, o.id AS product, o.name AS name, e.summary AS summary, s.id AS span""", iid=interaction):
+        proposals.append({"id": f"ACT:{e['id']}", "interaction_id": interaction, "team": team, "created_by": user,
+                          "title": f"Open service issue: {e['summary']} ({e['name']})", "product": e["product"],
+                          "promotes": False, "addresses": [("ExperienceObservation", e["id"])], "sources": [e["span"]], "requires": [],
+                          "fulfils": [], "due": date.fromordinal(at.toordinal() + 14)})
     return proposals[:3]

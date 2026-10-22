@@ -3,12 +3,12 @@ extractor: claude-opus-5-5
 candidates:
 - id: LLM-INT-2026-03-QBR-NF-1
   kind: intent
-  span: May is exploring Managed Portfolio Service B for a new group of retirement
+  span: May is exploring their UMA for a new group of retirement
     clients.
   speaker: ADV-002
   concept: exploring or comparing
-  target: SVC-B
-  desired_outcome: Use Managed Portfolio Service B for a new group of retirement clients
+  target: CPX-UMA
+  desired_outcome: Use CPX Unified Managed Account for a new group of retirement clients
   proposes_state: evaluating
   alternatives: []
 unmapped: []
@@ -19,6 +19,10 @@ usage:
   cache_read: 2910
   cache_write: 0
 review:
-  by: REP-OMAR
+  by: REP-KAI
   at: 2026-03-12
   decision: confirmed
+follow_up:
+  by: REP-OMAR
+  at: 2026-03-12
+  approve: [intent]

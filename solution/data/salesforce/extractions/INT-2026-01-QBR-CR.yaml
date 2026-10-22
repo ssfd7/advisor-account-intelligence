@@ -4,38 +4,44 @@ extractor: fixture-v1
 candidates:
   - id: CAND-01-1
     kind: experience
-    span: her investors find the Managed Portfolio Service A statements difficult to understand
-    product: SVC-A
+    span: her investors find the Crestline Model Portfolios statements difficult to understand
+    product: CMP
     speaker: ADV-001
     affected: investor group
     evidence_type: testimony
-    summary: Investors find Service A statements hard to understand
+    summary: Investors find CMP statements hard to understand
   - id: CAND-01-2
     kind: experience
     span: her team spends hours each quarter explaining them
-    product: SVC-A
+    product: CMP
     speaker: ADV-001
     affected: advisor team
     evidence_type: testimony
     summary: Advisor team spends hours explaining statements
   - id: CAND-01-3
     kind: intent
-    span: She is considering Managed Portfolio Service B on Platform B
+    span: She is considering the UMA on Crestline Portfolio Exchange
     concept: exploring or comparing
-    target: SVC-B
-    alternatives: [SVC-A]
+    target: CPX-UMA
+    alternatives: [CMP]
     speaker: ADV-001
     desired_outcome: Clearer investor reporting
-    reason: Statement difficulty with Service A
+    reason: Statement difficulty with CMP
     proposes_state: evaluating
   - id: CAND-01-4
     kind: commitment
     span: I promised to arrange a session with a product specialist on reporting and integration.
-    product: SVC-B
+    product: CPX-UMA
     made_by: REP-JORDAN
     due: 2026-02-28
     summary: Specialist session on reporting and integration
 review:
-  by: REP-JORDAN
+  by: REP-DANA
   at: 2026-01-16
   decision: confirmed
+# Follow-up decided by the relationship owner: actions on intents approved, the rest dismissed with a reason.
+follow_up:
+  by: REP-JORDAN
+  at: 2026-01-16
+  approve: [intent]
+  dismiss_reason: Raised with the statements team by email; no service ticket opened

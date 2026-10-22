@@ -3,9 +3,9 @@ extractor: fixture-v1
 candidates:
   - id: CAND-02-1
     kind: experience
-    span: Maya said her investors find the Managed Portfolio Service A statements difficult to understand, and her team spends hours each quarter explaining them.
-    product: SVC-A
+    span: Maya said her investors find the Crestline Model Portfolios statements difficult to understand, and her team spends hours each quarter explaining them.
+    product: CMP
     speaker: REP-JORDAN
     affected: investor group
     evidence_type: testimony
-    summary: Quoted January statement about Service A statements
+    summary: Quoted January statement about CMP statements

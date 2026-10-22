@@ -1,30 +1,50 @@
-catalog_version: "2026.1"
+catalog_version: "2026.2"
+# Fictional firm: Crestline. Names are deliberately not letter swaps of any real provider's products.
 platforms:
-  - {id: PLAT-A, name: Platform A, service_types: [custody, managed portfolios]}
-  - {id: PLAT-B, name: Platform B, service_types: [managed portfolios]}
+  - id: PLAT-CI
+    name: Crestline Institutional
+    aliases: [Crestline, CI]
+    service_types: [custody, clearing, managed portfolios]
+  - id: PLAT-CPX
+    name: Crestline Portfolio Exchange
+    aliases: [CPX, the exchange]
+    service_types: [managed account platform]
 offerings:
-  - id: CUST-A
-    name: Custody Service A
-    platform: PLAT-A
+  - id: CCC
+    name: Crestline Custody and Clearing
+    aliases: [Crestline custody, custody]
+    platform: PLAT-CI
     category: custody
     valid_from: 2019-01-01
     capabilities:
-      - {id: CAP-CUST-A-1, name: Daily position reconciliation, valid_from: 2019-01-01}
-  - id: SVC-A
-    name: Managed Portfolio Service A
-    platform: PLAT-A
+      - {id: CAP-CCC-1, name: Daily position reconciliation, valid_from: 2019-01-01}
+  - id: CMP
+    name: Crestline Model Portfolios
+    aliases: [CMP, model portfolios, Crestline models]
+    platform: PLAT-CI
     category: managed portfolio service
     valid_from: 2020-06-01
     capabilities:
-      - {id: CAP-SVC-A-1, name: Quarterly investor statements, valid_from: 2020-06-01}
-  - id: SVC-B
-    name: Managed Portfolio Service B
-    platform: PLAT-B
-    category: managed portfolio service
+      - {id: CAP-CMP-1, name: Quarterly investor statements, valid_from: 2020-06-01}
+  - id: CPX-UMA
+    name: CPX Unified Managed Account
+    aliases: [CPX UMA, UMA, unified managed account]
+    platform: PLAT-CPX
+    category: unified managed account
     valid_from: 2025-09-01
     capabilities:
-      - {id: CAP-SVC-B-1, name: Consolidated investor statements with plain-language summary, valid_from: 2025-09-01}
-      - {id: CAP-SVC-B-2, name: Advisor portal with statement annotations, valid_from: 2025-09-01}
+      - {id: CAP-UMA-1, name: Consolidated investor statements with plain-language summary, valid_from: 2025-09-01}
+      - {id: CAP-UMA-2, name: Advisor portal with statement annotations, valid_from: 2025-09-01}
     prerequisites:
       - {id: PRQ-001, name: Portfolio accounting integration verified}
+  - id: CDI
+    name: Crestline Direct Index Builder
+    aliases: [direct indexing, DIB]
+    platform: PLAT-CPX
+    category: direct indexing
+    valid_from: 2026-01-15
+    capabilities:
+      - {id: CAP-CDI-1, name: Tax-loss harvesting on custom indexes, valid_from: 2026-01-15}
+# Words for kinds of product. A phrase like these that does not link to an offering is reported as unresolved for the SME.
+product_terms: [separate accounts, separately managed account, SMA, UMA, unified managed account, model portfolios, direct indexing, annuity, annuities]
 # Capabilities not listed are unknown, not absent. Integration with specific portfolio accounting systems is not documented.

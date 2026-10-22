@@ -3,9 +3,9 @@ extractor: fixture-v1
 candidates:
   - id: CAND-03-1
     kind: intent
-    span: Maya is postponing the Service B evaluation because the integration with her portfolio accounting system has not been verified.
+    span: Maya is postponing the CPX UMA evaluation because the integration with her portfolio accounting system has not been verified.
     concept: postponing
-    target: SVC-B
+    target: CPX-UMA
     alternatives: []
     speaker: ADV-001
     desired_outcome: Verified integration before evaluating further
@@ -14,12 +14,12 @@ candidates:
     proposes_state: paused
   - id: CAND-03-2
     kind: experience
-    span: investors keep calling her team about the Service A quarterly statements
-    product: SVC-A
+    span: investors keep calling her team about the CMP quarterly statements
+    product: CMP
     speaker: ADV-001
     affected: investor group
     evidence_type: testimony
-    summary: Investors still calling about Service A statements
+    summary: Investors still calling about CMP statements
   - id: CAND-03-3
     kind: commitment_status
     span: The specialist session promised in January has not happened yet.

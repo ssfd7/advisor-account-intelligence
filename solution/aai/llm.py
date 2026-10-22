@@ -4,7 +4,7 @@
 
 Output uses the same YAML format as the fixture extractions, so ingestion, span checks, repetition detection and
 human review apply unchanged. Candidates are proposals only; nothing reaches memory until a reviewer confirms it.
-Credentials: ANTHROPIC_API_KEY, ANTHROPIC_AUTH_TOKEN, or an `ant auth login` profile.
+Credentials: ANTHROPIC_API_KEY (environment or the git-ignored project .env), ANTHROPIC_AUTH_TOKEN, or an `ant auth login` profile.
 """
 import json
 import sys
@@ -100,8 +100,19 @@ def context_block(meta, catalog, taxonomy, roster, advisors, firms, prior_commit
     return json.dumps(ctx, sort_keys=True, indent=1)
 
 
+def load_env(path: Path = DATA.parents[1] / ".env"):
+    """Read KEY=value lines from the git-ignored project .env without overriding variables already set."""
+    import os
+    if path.exists():
+        for line in path.read_text().splitlines():
+            key, sep, value = line.strip().partition("=")
+            if sep and key and not key.startswith("#") and value and key not in os.environ:
+                os.environ[key] = value.strip().strip('"').strip("'")
+
+
 def client():
     import anthropic
+    load_env()
     return anthropic.Anthropic()
 
 

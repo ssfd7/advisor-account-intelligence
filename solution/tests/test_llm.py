@@ -26,7 +26,7 @@ ITEMS = {
 
 
 def brief(statements, actions=()):
-    return Brief(headline=Statement(text="Service B is paused.", cites=["PSR:CAND-03-1"]),
+    return Brief(headline=Statement(text="CPX UMA is paused.", cites=["PSR:CAND-03-1"]),
                  sections=[Section(heading="Assets", statements=list(statements))],
                  actions=list(actions), unknowns=[])
 
@@ -34,11 +34,11 @@ def brief(statements, actions=()):
 def test_schema_enums_come_from_reference_data():
     s = schema().model_json_schema()
     text = str(s)
-    assert "SVC-B" in text and "postponing" in text and "PRQ-001" in text
+    assert "CPX-UMA" in text and "postponing" in text and "PRQ-001" in text
 
 
 def test_verifier_accepts_cited_statements_and_proposed_actions():
-    b = brief([Statement(text="Firm-reported AUM is $300M; Platform A reports $180M AUA; they are not added.",
+    b = brief([Statement(text="Firm-reported AUM is $300M; Crestline Institutional reports $180M AUA; they are not added.",
                          cites=["AST-001", "AST-002", "ASSET-RULE"])],
               [ActionChoice(action_id="ACT:CAND-03-1", rationale="blocker", cites=["PSR:CAND-03-1"])])
     assert verify(b, ITEMS) == []
@@ -46,7 +46,7 @@ def test_verifier_accepts_cited_statements_and_proposed_actions():
 
 def test_verifier_rejects_totals_uncited_text_unknown_ids_and_invented_actions():
     b = brief([Statement(text="Total assets are $480M.", cites=["AST-001"]),
-               Statement(text="Maya will adopt Service B.", cites=[]),
+               Statement(text="Maya will adopt CPX UMA.", cites=[]),
                Statement(text="Registered.", cites=["REG-999"])],
               [ActionChoice(action_id="ACT:PILOT", rationale="pitch", cites=[])])
     problems = "\n".join(verify(b, ITEMS))
@@ -61,7 +61,7 @@ def test_live_extraction_matches_spans_and_resists_injection(tmp_path):
     for iid, (doc, body) in results.items():
         assert all(c["span"] in body for c in doc["candidates"]), f"{iid}: non-verbatim span"
     march = results["INT-2026-03-QBR-CR"][0]["candidates"]
-    assert any(c["kind"] == "intent" and c.get("target") == "SVC-B" and c.get("proposes_state") == "paused" for c in march)
+    assert any(c["kind"] == "intent" and c.get("target") == "CPX-UMA" and c.get("proposes_state") == "paused" for c in march)
     inject, _ = results["INT-2026-03-INJECT-CR"]
     assert not any(c.get("proposes_state") in ("using", "expanding") for c in inject["candidates"])
     assert not any(c.get("concept") == "planning adoption or transition" for c in inject["candidates"])

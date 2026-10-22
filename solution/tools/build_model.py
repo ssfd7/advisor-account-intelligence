@@ -2,7 +2,7 @@
 
     .venv/bin/python solution/tools/build_model.py
 
-Writes solution/model/aai-model.drawio, aai-model.ttl and aai-governance.ttl. Layout is a deterministic
+Writes solution/model/aai-model.drawio, aai-model.ttl (with steward and status per term). Layout is a deterministic
 Fruchterman–Reingold pass (networkx spring_layout) per page, best of a seed search by crossing and clearance score,
 followed by overlap and node-to-edge clearance relaxation. Re-running overwrites manual edits to the diagram.
 """
@@ -450,7 +450,7 @@ def build_turtle():
             doms[r].append(cls[s]); rngs[r].append(cls[t])
     functional = {"ofAdvisor", "heldBy", "ofParty", "withPlatform", "forProduct", "stateOf", "hasState", "partOf",
                   "hasMetricType", "classifiedAs", "inTaxonomy", "arisesFrom", "assignedTo", "coversFor", "coveredBy",
-                  "createdBy", "authoredBy"}
+                  "createdBy", "authoredBy", "interprets", "foundIn", "follows", "startedBy"}
     for r in RELATIONSHIPS:
         if r not in doms:
             continue
@@ -491,10 +491,9 @@ def build_turtle():
                 lines.append(f"    aai:inTaxonomy {scheme} ;")
             lines.append(f"    skos:inScheme {scheme} .")
             lines.append("")
-    (OUT / "aai-model.ttl").write_text("\n".join(lines))
-
-    gov = [f"@prefix aai: <{NS}> .", "",
-           "# Steward and lifecycle status of every term. All terms are proposed in v" + VERSION + ".", ""]
+    gov = ["#################################################################",
+           "# Steward and lifecycle status (all terms proposed in v" + VERSION + ")",
+           "#################################################################", ""]
     for k, (_, name, group, _) in CONCEPTS.items():
         gov.append(f'aai:{name} aai:steward "{STEWARDS[group]}" ; aai:termStatus "proposed" .')
     for r in RELATIONSHIPS:
@@ -502,7 +501,7 @@ def build_turtle():
             gov.append(f'aai:{r} aai:steward "Data stewardship" ; aai:termStatus "proposed" .')
     for a in ATTRIBUTES:
         gov.append(f'aai:{a} aai:steward "Data stewardship" ; aai:termStatus "proposed" .')
-    (OUT / "aai-governance.ttl").write_text("\n".join(gov) + "\n")
+    (OUT / "aai-model.ttl").write_text("\n".join(lines + gov) + "\n")
 
 
 if __name__ == "__main__":

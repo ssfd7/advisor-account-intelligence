@@ -1,0 +1,19 @@
+version: 1
+# Asset measures the firm recognizes, and what may be computed from them. Steward: Data stewardship.
+metrics:
+  - id: regulatory AUM
+    words: [regulatory AUM, RAUM]
+    definition: Regulatory assets under management as defined for Form ADV Item 5.F.
+  - id: reported AUM
+    words: [AUM, assets under management]
+    definition: Assets under management as reported by the firm or stated by the advisor; entity, scope, methodology and date must be explicit.
+  - id: AUA
+    words: [AUA, assets under administration]
+    definition: Assets under administration under the reporting provider's own definition and scope.
+allowed_computations:
+  - id: compare-over-time
+    rule: Two observations may be compared as a change over time only if metric type, currency and scope match.
+  - id: total-or-share
+    rule: A total or a share is allowed only if metric type, currency, scope and as-of date all match.
+  - id: never
+    rule: Never add AUM to AUA, never allocate a firm figure to an advisor or product, never treat an advisor's stated figure as the firm's reported figure.
