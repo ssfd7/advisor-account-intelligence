@@ -49,7 +49,7 @@ class TaskStore:
         if fresh and path.exists():
             path.unlink()
         path.parent.mkdir(parents=True, exist_ok=True)
-        self.db = sqlite3.connect(path)
+        self.db = sqlite3.connect(path, check_same_thread=False)  # the app reuses one store across reruns, one at a time
         self.db.row_factory = sqlite3.Row
         self.db.executescript(SCHEMA)
         self.roster = roster
