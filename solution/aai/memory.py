@@ -60,6 +60,8 @@ def promoter(g: Graph, interactions: dict):
             g.link("Interaction", iid, "records", "ExperienceObservation", cand["id"])
             g.link("ExperienceObservation", cand["id"], "concerns", "ProductOffering", p["product"])
             g.link("ExperienceObservation", cand["id"], "supportedBy", "SourceSpan", cand["span_id"])
+            g.run("MATCH (e:ExperienceObservation {id: $e}), (s:Sentiment {label: $l}) MERGE (e)-[:hasSentiment]->(s)",
+                  e=cand["id"], l=p.get("sentiment") or "not recorded")
             if (p.get("speaker") or "").startswith("ADV-"):
                 g.link("ExperienceObservation", cand["id"], "reportedBy", "Advisor", p["speaker"])
         elif kind == "intent":

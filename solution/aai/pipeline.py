@@ -25,7 +25,7 @@ BUNDLE = SOLUTION / "bundle"
 PROCEDURE = BUNDLE / "procedures" / "qbr-understanding-and-follow-up.md"
 DRAFTS = STATE / "semantic-qbr"
 WRITES = {
-    "experience": ["aai:ExperienceObservation", "aai:concerns", "aai:reportedBy", "aai:affects", "aai:supportedBy"],
+    "experience": ["aai:ExperienceObservation", "aai:concerns", "aai:reportedBy", "aai:affects", "aai:hasSentiment", "aai:supportedBy"],
     "intent": ["aai:Intent", "aai:targets", "aai:considersAlternative", "aai:classifiedAs", "aai:supersedes",
                "aai:supportedBy", "aai:ProductStateRecord"],
     "commitment": ["aai:Commitment", "aai:madeBy", "aai:dueDate"],
@@ -42,7 +42,7 @@ def procedure() -> dict:
 def _names(data=DATA):
     """Display names for offering, platform and intent concept ids."""
     catalog = yaml.safe_load((data / "reference" / "catalog.yaml").read_text())
-    taxonomy = yaml.safe_load((data / "reference" / "taxonomy.yaml").read_text())
+    taxonomy = yaml.safe_load((data / "reference" / "intents.yaml").read_text())
     return {o["id"]: o["name"] for o in catalog["offerings"] + catalog["platforms"]} | \
         {c["id"]: c["label"] for c in taxonomy["concepts"]}
 
@@ -101,7 +101,8 @@ def render(store: TaskStore, roster: Roster, meta: dict, body: str, firm_name: s
     hints = unlinked_findings(cands, det["mentions"], body)
     for c in cands:
         p = c["payload"]
-        what = {"experience": lambda: f"{p.get('affected')}: {p.get('summary')} ({names.get(p.get('product'), p.get('product'))})",
+        what = {"experience": lambda: f"{p.get('sentiment') or 'sentiment not recorded'}, {p.get('affected')}: {p.get('summary')} "
+                                      f"({names.get(p.get('product'), p.get('product'))})",
                 "intent": lambda: f"{names.get(p.get('concept'), p.get('concept'))} → {names.get(p.get('target'), p.get('target'))}"
                                   + (f"; proposes state `{p['proposes_state']}`" if p.get("proposes_state") else ""),
                 "commitment": lambda: f"{p.get('summary')}, due {p.get('due')}",
@@ -114,6 +115,9 @@ def render(store: TaskStore, roster: Roster, meta: dict, body: str, firm_name: s
         text = p.get("span") or (_span(body, *map(int, c["span_id"].split("#")[1].split("-"))) if c["span_id"] else "")
         out += [f"## {c['id']} · {c['kind'].replace('_', ' ')}", "", f"> {text}", "", f"- Reads as: {what}",
                 f"- Writes: {', '.join(WRITES[c['kind']])}", f"- Decision: {decision}"]
+        if c["kind"] == "experience" and not p.get("sentiment"):
+            hints[c["id"]] = (hints.get(c["id"], "") + "; " if c["id"] in hints else "") + \
+                "no sentiment recorded, so no follow-up will be proposed; re-extract or note it"
         if c["id"] in hints:
             out.append(f"- Hint for the SME: {hints[c['id']]}")
         out.append("")

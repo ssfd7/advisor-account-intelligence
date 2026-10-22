@@ -1,0 +1,40 @@
+# Intent catalog: what an advisor intends toward one product. Steward: Business analysis.
+# An intent always targets one offering. It may propose a product state only as listed; using, expanding and
+# discontinued need an operational record. Dissatisfaction is an experience, not an intent to leave.
+version: 1
+concepts:
+  - id: INT-01
+    label: exploring or comparing
+    definition: The advisor is looking at an offering, alone or against what they use now.
+    examples: ["She is considering the UMA on Crestline Portfolio Exchange", "May is exploring their UMA"]
+    proposes_state: evaluating
+  - id: INT-02
+    label: planning adoption or transition
+    definition: The advisor states a plan to start using an offering or move assets to it, with or without a date.
+    examples: ["We plan to move the retirement book to CMP next quarter"]
+    proposes_state: null
+  - id: INT-03
+    label: expanding use
+    definition: The advisor intends to use an offering they already use for more clients, assets or features.
+    examples: ["We want CMP for our newer clients too"]
+    proposes_state: null
+  - id: INT-04
+    label: requesting support
+    definition: The advisor asks for help, information or a session about an offering.
+    examples: ["asked for a comparison of reporting and integration capabilities"]
+    proposes_state: null
+  - id: INT-05
+    label: postponing
+    definition: The advisor pauses a decision about an offering, usually until a blocker is resolved.
+    examples: ["Maya is postponing the CPX UMA evaluation because the integration has not been verified"]
+    proposes_state: paused
+  - id: INT-06
+    label: rejecting or discontinuing
+    definition: The advisor decides not to use, or to stop using, an offering. The reason is kept permanently.
+    examples: ["We decided against direct indexing for now"]
+    proposes_state: rejected
+  - id: INT-07
+    label: unknown
+    definition: A statement about an offering whose intent cannot be classified; kept for the SME, never forced into a label.
+    examples: []
+    proposes_state: null

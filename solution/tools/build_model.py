@@ -429,7 +429,7 @@ def build_turtle():
         if r == "subclassOf" and cls[t] not in supers[s]:
             supers[s].append(cls[t])
     extra_super = {"productState": "skos:Concept", "metricType": "skos:Concept", "affectedGroup": "skos:Concept",
-                   "intentConcept": "skos:Concept", "taxonomyVersion": "skos:ConceptScheme",
+                   "intentConcept": "skos:Concept", "sentiment": "skos:Concept", "taxonomyVersion": "skos:ConceptScheme",
                    "sourceRecord": "prov:Entity", "span": "prov:Entity"}
     for k, (label, name, group, definition) in CONCEPTS.items():
         lines.append(f"aai:{name} a owl:Class ;")
@@ -449,7 +449,7 @@ def build_turtle():
         if r != "subclassOf":
             doms[r].append(cls[s]); rngs[r].append(cls[t])
     functional = {"ofAdvisor", "heldBy", "ofParty", "withPlatform", "forProduct", "stateOf", "hasState", "partOf",
-                  "hasMetricType", "classifiedAs", "inTaxonomy", "arisesFrom", "assignedTo", "coversFor", "coveredBy",
+                  "hasMetricType", "hasSentiment", "classifiedAs", "inTaxonomy", "arisesFrom", "assignedTo", "coversFor", "coveredBy",
                   "createdBy", "authoredBy", "interprets", "foundIn", "follows", "startedBy"}
     for r in RELATIONSHIPS:
         if r not in doms:

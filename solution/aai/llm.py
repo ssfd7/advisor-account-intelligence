@@ -24,7 +24,7 @@ EXTRACTIONS_LLM = DATA / "salesforce" / "extractions-llm"
 
 def _reference():
     catalog = yaml.safe_load((DATA / "reference" / "catalog.yaml").read_text())
-    taxonomy = yaml.safe_load((DATA / "reference" / "taxonomy.yaml").read_text())
+    taxonomy = yaml.safe_load((DATA / "reference" / "intents.yaml").read_text())
     roster = yaml.safe_load((DATA / "reference" / "roster.yaml").read_text())
     return catalog, taxonomy, roster
 
@@ -32,8 +32,10 @@ def _reference():
 def schema():
     """Pydantic models whose enums come from the approved catalog, taxonomy and roster."""
     catalog, taxonomy, roster = _reference()
+    sentiments = yaml.safe_load((DATA / "reference" / "sentiments.yaml").read_text())
     Product = Literal[tuple(o["id"] for o in catalog["offerings"])]
     Concept = Literal[tuple(c["label"] for c in taxonomy["concepts"])]
+    Sentiment = Literal[tuple(s["label"] for s in sentiments["concepts"] if s["label"] != "not recorded")]
     Prereq = Literal[tuple(q["id"] for o in catalog["offerings"] for q in o.get("prerequisites", []))]
     Rep = Literal[tuple(r["id"] for r in roster["reps"])]
 
@@ -43,6 +45,7 @@ def schema():
         speaker: Optional[str] = Field(description="ADV-... id of the advisor who said it, or the REP-... id of the author")
         product: Optional[Product] = Field(description="Product an experience or commitment concerns")
         affected: Optional[Literal["advisor", "advisor team", "investor group"]] = Field(description="Whose experience it is")
+        sentiment: Optional[Sentiment] = Field(description="For experiences: how the speaker judges it, from the sentiment catalog")
         evidence_type: Optional[Literal["testimony", "measured"]]
         summary: Optional[str] = Field(description="Short neutral summary for experience and commitment")
         concept: Optional[Concept] = Field(description="Intent taxonomy label, for intents")
@@ -74,7 +77,9 @@ Rules:
 - Every candidate's span must be copied character for character from the note, short enough to be specific.
 - Record whose words they are. An advisor reporting that investors are frustrated is advisor testimony
   (speaker = the advisor, affected = investor group, evidence_type = testimony), not an investor statement.
-- An experience is a reported experience with a product. An intent is a stated business intention toward a product,
+- An experience is a reported experience with a product. Give its sentiment: negative (a problem or cost), positive
+  (works well), mixed (both in one statement) or neutral (use without judgement).
+- An intent is a stated business intention toward a product,
   classified with the taxonomy. Dissatisfaction is not an intent to leave.
 - proposes_state only when the advisor states a change for that product: considering or comparing -> evaluating,
   postponing -> paused, rejecting -> rejected. Never propose using, expanding or discontinued from a conversation;

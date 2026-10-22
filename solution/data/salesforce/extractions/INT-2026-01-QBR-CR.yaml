@@ -9,6 +9,7 @@ candidates:
     speaker: ADV-001
     affected: investor group
     evidence_type: testimony
+    sentiment: negative
     summary: Investors find CMP statements hard to understand
   - id: CAND-01-2
     kind: experience
@@ -17,6 +18,7 @@ candidates:
     speaker: ADV-001
     affected: advisor team
     evidence_type: testimony
+    sentiment: negative
     summary: Advisor team spends hours explaining statements
   - id: CAND-01-3
     kind: intent
@@ -35,6 +37,15 @@ candidates:
     made_by: REP-JORDAN
     due: 2026-02-28
     summary: Specialist session on reporting and integration
+  - id: CAND-01-5
+    kind: experience
+    span: Custody with Crestline is working well and is not under review.
+    product: CCC
+    speaker: ADV-001
+    affected: advisor
+    evidence_type: testimony
+    sentiment: positive
+    summary: Custody is working well and not under review
 review:
   by: REP-DANA
   at: 2026-01-16

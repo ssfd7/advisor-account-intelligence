@@ -50,7 +50,7 @@ A second firm, Northfield Wealth Partners, has an advisor named May Chen. Her re
 
 | Memory type | Business outcome | In scope | Out of scope |
 |---|---|---|---|
-| **Semantic**: what the firm knows | The firm knows what advisors tell it; we stop saying the wrong thing | Realistic catalog with names, aliases, capabilities and prerequisites; intent taxonomy; AUM/AUA definitions and allowed computations; advisor and firm identities, kept apart when names are similar; exams and registrations, kept apart; current product states and intents from approved findings | Full enterprise ontology; pricing; suitability rules; registration rules engine |
+| **Semantic**: what the firm knows | The firm knows what advisors tell it; we stop saying the wrong thing | Realistic catalog with names, aliases, capabilities and prerequisites; intent catalog; sentiment catalog; AUM/AUA definitions and allowed computations; advisor and firm identities, kept apart when names are similar; exams and registrations, kept apart; current product states and intents from approved findings | Full enterprise ontology; pricing; suitability rules; registration rules engine |
 | **Episodic**: what happened, was said, and when | Reps prepared in minutes; everything provable | Notes and emails stored on arrival; approved semantic QBRs, each finding tied to its sentence; rejected findings with reasons; repetitions linked; narrow supersession; as-of answers; outcomes with evidence | Clickstream; call audio; individual investor interactions |
 | **Procedural**: how the firm acts | No promise falls through the cracks | The OKF bundle with the QBR procedure, computations and tools; procedure runs binding steps to findings, owners and due dates | Agents changing procedures |
 | **Working**: in flight | Experts stay in control | Detection output, the draft semantic QBR, the brief's evidence and draft | Long-lived scratchpads; cross-session chat |
@@ -64,6 +64,7 @@ The first release covers one advisor across review cycles. Pooled knowledge acro
 - **Assets.** AUM and AUA are different measures; reporters define AUA differently, and regulatory AUM is a specific Form ADV measure ([SEC Form ADV instructions](https://www.sec.gov/about/forms/formadv-instructions.pdf)). A total or share needs matching metric, currency, scope and date. A firm figure is never allocated to an advisor or product. An advisor's stated figure is testimony.
 - **Credentials.** An exam result (SIE, Series 65 or 66) is not a registration and does not establish eligibility ([FINRA qualification exams](https://www.finra.org/registration-exams-ce/qualification-exams)). Missing registration evidence is shown as unknown.
 - **Catalog.** An undocumented capability is unknown, never assumed.
+- **Sentiment.** Each reported experience carries the speaker's sentiment from the sentiment catalog. A negative experience leads to a service issue, a mixed one to a clarification, praise to nothing. Sentiment is testimony, not a measured outcome.
 
 ## 8. Success measures
 

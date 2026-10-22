@@ -151,11 +151,12 @@ def main():
         item = approve(g, store, roster, interactions, bodies, firms, "REP-LEE", EMAIL, D23, {},
                        no_action_reason="Forwarded email only repeats the January QBR")
         print(f"  the lead closes the email review: {item['status']}: {item['note']}")
-    service = next(a for a in march if a["title"].startswith("Open service issue"))
+    service = next((a for a in march if a["title"].startswith("Open service issue")), march[0])
     refused("close a step without evidence",
             lambda: store.complete_action("REP-PRIYA", service["id"], D27, "", write_completion(g)))
-    done = store.complete_action("REP-PRIYA", service["id"], D27, "SR-4471 opened with the CMP statements team; explainer sent",
-                                 write_completion(g))
+    evidence = ("SR-4471 opened with the CMP statements team; explainer sent" if service["title"].startswith("Open service issue")
+                else "Specialist session held 26 March; integration checklist sent to Cedar Ridge")
+    done = store.complete_action("REP-PRIYA", service["id"], D27, evidence, write_completion(g))
     print(f"  27 March: {done['id']} {done['status']} with evidence '{done['evidence']}'")
     print("  team queue on 27 March:")
     table(store.queue("TEAM-CR", D27), ["item", "type", "status", "owner", "due", "overdue", "handoff"])
@@ -179,6 +180,9 @@ def main():
     print(f"  total of these figures allowed: {combined['allowed']}")
     for r in combined.get("reasons", []):
         print(f"    - {r}")
+    praise = [e for e in q.experience(g, roster, "REP-PRIYA", "FIRM-001", D20, D20) if e["sentiment"] == "positive"]
+    for e in praise:
+        print(f"  no service issue for praise: '{e['summary']}' ({e['product']}, sentiment {e['sentiment']})")
     p = q.profile(g, roster, "REP-PRIYA", "ADV-001", D20, D20)
     print(f"  credentials: {', '.join(x['exam'] + ' ' + x['result'] for x in p['qualifications'])}; {p['gaps'][0]}")
     print(f"  catalog, CPX UMA portfolio-accounting integration: {q.capability(g, 'CPX-UMA', 'integration')['status']}")

@@ -66,14 +66,14 @@ Extraction uses structured outputs whose enums come from the catalog, taxonomy a
 | [`solution/model/`](solution/model/README.md) | Knowledge graph model: Draw.io (overview and four pages) and Turtle |
 | `solution/bundle/` | OKF bundle: the QBR procedure, its computations and tools, generated glossaries and graph mapping |
 | `solution/aai/` | Detection, pipeline, memory, task store, queries, brief, demo |
-| `solution/data/` | Synthetic catalog, roster, notes, profile exports and extractions |
+| `solution/data/` | Reference catalogs (`reference/`: products, intents, sentiments, asset definitions, roster), synthetic notes, profile exports and extractions |
 | `solution/tests/` | Golden and LLM tests |
 | `solution/tools/` | Model generator and checker, diagram renderer |
 | [`AGENTS.md`](AGENTS.md) | Modelling and Draw.io conventions |
 
 ## Limits
 
-Problem statements and targets are hypotheses to validate with a relationship team; none is a measured result. Action proposals are rules, not a model. The committed Claude extractions predate the Crestline catalog: product names in them were renamed mechanically rather than re-extracted, and extraction has no sentiment, so a positive remark can be proposed as a service issue. Retention and decay are designed but not built. Domain distinctions were checked against FINRA and SEC sources on 19 October 2026; nothing here decides registration, eligibility or suitability.
+Problem statements and targets are hypotheses to validate with a relationship team; none is a measured result. Action proposals are rules, not a model. The committed Claude extractions predate the Crestline catalog and the sentiment catalog: product names in them were renamed mechanically rather than re-extracted, and their experiences carry sentiment "not recorded" until `aai.llm extract` is re-run. Retention and decay are designed but not built. Domain distinctions were checked against FINRA and SEC sources on 19 October 2026; nothing here decides registration, eligibility or suitability.
 
 ## Licence
 

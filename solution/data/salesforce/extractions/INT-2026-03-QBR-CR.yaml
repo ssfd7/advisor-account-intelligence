@@ -19,6 +19,7 @@ candidates:
     speaker: ADV-001
     affected: investor group
     evidence_type: testimony
+    sentiment: negative
     summary: Investors still calling about CMP statements
   - id: CAND-03-3
     kind: commitment_status

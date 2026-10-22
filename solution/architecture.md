@@ -1,6 +1,6 @@
 # Advisor Account Intelligence: architecture
 
-Version 0.2 · 21 October 2026 · Companion to [the product brief](../business/advisor-account-intelligence-product.md)
+Version 0.3 · 22 October 2026 · Companion to [the product brief](../business/advisor-account-intelligence-product.md)
 
 The product turns each QBR note into knowledge the firm can act on. This document describes how: the pipeline, the five memory types it reads and writes, the one gate between them, and the OKF bundle that holds the procedure. Code paths are under `solution/`.
 
@@ -12,7 +12,7 @@ The product turns each QBR note into knowledge the firm can act on. This documen
 |---|---|---|---|
 | Note arrives | system | `aai/ingest.py` | The note is stored with its import version; a review item gets an owner (the team's SME) and a deadline, whether or not anything is extracted |
 | 1 · Concept detection | agent | `aai/detect.py` | Product mentions linked to the catalog by name or alias, longest phrase first, whole words only; product words with no link marked unresolved; asset figures read with their metric and scope |
-| 2 · Candidate findings | agent | `aai/llm.py` or fixtures | Experience, intent and commitments, each with a span copied verbatim from the note. A span that is not verbatim is rejected before review; a quoted repetition is linked to its original |
+| 2 · Candidate findings | agent | `aai/llm.py` or fixtures | Experience (with sentiment), intent and commitments, each with a span copied verbatim from the note. A span that is not verbatim is rejected before review; a quoted repetition is linked to its original |
 | 3 · Semantic QBR | agent | `aai/pipeline.py#draft` | One OKF concept (`status: draft`) with mentions, asset figures and findings, each tied to its sentence, and the ontology terms its findings would write |
 | 4 · SME approval | human | `aai/pipeline.py#approve` | Each finding confirmed or rejected with a reason; the file becomes `status: verified` |
 | 5 · Hydration | agent | `aai/pipeline.py#hydrate` | Approved findings in the graph; the semantic QBR and its mentions as nodes; a procedure run with proposed actions owned by the relationship owner |
@@ -26,7 +26,7 @@ Source text is data: instructions inside a note are flagged for the reviewer and
 
 | Memory | Holds | Store | Written by | Lifetime |
 |---|---|---|---|---|
-| Semantic: what the firm knows | Catalog (names, aliases, capabilities, prerequisites), intent taxonomy, AUM/AUA definitions and allowed computations, identities, exams and registrations kept apart, current product states and intents | `data/reference/`, graph | Authoritative feeds; promotion of approved findings | Durable; superseded, never overwritten |
+| Semantic: what the firm knows | Product catalog (names, aliases, capabilities, prerequisites), intent catalog, sentiment catalog, AUM/AUA definitions and allowed computations, identities, exams and registrations kept apart, current product states and intents | `data/reference/`, graph | Authoritative feeds; promotion of approved findings | Durable; superseded, never overwritten |
 | Episodic: what happened, was said, and when | Notes and emails as they arrived, approved semantic QBRs, findings tied to their sentence, rejected findings with reasons, repetitions, outcomes with evidence | Graph plus source files, task store, `.data/semantic-qbr/` | Ingestion (notes) and the gate (findings) | Durable |
 | Procedural: how the firm acts | The OKF bundle; procedure runs binding steps to findings, owners and due dates | `bundle/`, task store, graph | Authored and versioned; runs started by hydration | Durable; versioned |
 | Working: in flight | Detection output, candidate findings, the draft semantic QBR, the brief's evidence bundle and draft | Task store, `.data/` | Agents | Until the decision is recorded or the draft expires |
@@ -49,6 +49,8 @@ Every fact carries a valid time (when it was true) and a recorded time (when the
 | Sources do not overwrite each other | The CRM's "pilot ready" and the approved "paused" both stay; a Discrepancy links them |
 | Testimony stays testimony | The advisor's "$320 million AUM" is stored as her statement, never merged with the firm-reported $300M or the platform's $180M AUA |
 | History is kept | Superseded intents, dismissed actions and rejected findings remain queryable with reasons |
+
+The reference catalogs are in `data/reference/`: `catalog.yaml` (products), `intents.yaml` (each intent's definition, examples and the product state it may propose), `sentiments.yaml` (each sentiment's definition and the follow-up it triggers) and `asset_definitions.yaml`. Intent concepts and sentiments are nodes in the graph, so findings link to them.
 
 Product state changes follow the rules in the product brief: a conversation can propose evaluating, paused or rejected, never using, expanding or discontinued, which need operational records.
 
@@ -84,7 +86,7 @@ cd solution
 
 ## 6. Knowledge model
 
-The structural model is in [model/](model/README.md): a Draw.io file with an overview and four detail pages, and its OWL counterpart `aai-model.ttl`, which also holds steward and status per term. Conventions are in [AGENTS.md](../AGENTS.md). Version 0.2 adds Semantic QBR, Product Mention, Procedure and Procedure Run, the relationships that connect them, and `alias` on offerings and platforms.
+The structural model is in [model/](model/README.md): a Draw.io file with an overview and four detail pages, and its OWL counterpart `aai-model.ttl`, which also holds steward and status per term. Conventions are in [AGENTS.md](../AGENTS.md). Version 0.2 added Semantic QBR, Product Mention, Procedure and Procedure Run, and `alias` on offerings and platforms. Version 0.3 adds the Sentiment code list, linked from Experience Observation by `hasSentiment`.
 
 ## 7. The brief
 
@@ -102,7 +104,6 @@ LadybugDB holds the graph; SQLite stands in for the task system; CSV and Markdow
 
 ## 10. Known gaps
 
-- Extraction has no sentiment, so a positive remark ("custody is working well", in the Claude extractions) is proposed as a service issue. Fix: add sentiment to the schema and re-run extraction.
-- The committed Claude extractions predate the Crestline catalog. Product names in them were renamed mechanically, not re-extracted; re-run `python -m aai.llm extract` to refresh them.
+- The committed Claude extractions predate the Crestline catalog and the sentiment catalog. Product names in them were renamed mechanically, and their experiences carry sentiment "not recorded", so no service issue is proposed from them. Re-run `python -m aai.llm extract` to refresh both.
 - Product-word detection is a fixed list in the catalog; unusual phrasings stay unlinked rather than wrongly linked.
 - Retention and decay are designed, not built. Taxonomy curation and clickstream are out of the first release.

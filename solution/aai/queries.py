@@ -103,7 +103,9 @@ def experience(g: Graph, roster: Roster, user: str, firm: str, valid_at: date, k
                          (e)-[:supportedBy]->(s:SourceSpan)
                    WHERE e.validFrom <= $va AND e.recordedAt <= $ka
                    OPTIONAL MATCH (e)-[:reportedBy]->(a:Advisor)
+                   OPTIONAL MATCH (e)-[:hasSentiment]->(sen:Sentiment)
                    RETURN e.id AS id, o.name AS product, e.summary AS summary, e.affectedGroup AS affected, e.evidenceType AS evidence,
+                          sen.label AS sentiment,
                           a.name AS reportedBy, i.id AS interaction, e.validFrom AS date,
                           s.startOffset AS spanStart, s.endOffset AS spanEnd ORDER BY e.validFrom""",
                 f=firm, va=valid_at, ka=known_at)
@@ -168,10 +170,15 @@ def propose_actions(g: Graph, roster: Roster, user: str, firm: str, interaction:
                           "title": title, "product": n["product"], "promotes": promotes, "addresses": [("Intent", n["id"])], "sources": [n["span"]],
                           "requires": n["prereqs"], "fulfils": open_commitments, "due": date.fromordinal(at.toordinal() + 21)})
     for e in g.run("""MATCH (e:ExperienceObservation)-[:concerns]->(o:ProductOffering), (e)-[:supportedBy]->(s:SourceSpan),
-                            (i:Interaction {id: $iid})-[:records]->(e)
-                      RETURN e.id AS id, o.id AS product, o.name AS name, e.summary AS summary, s.id AS span""", iid=interaction):
+                            (i:Interaction {id: $iid})-[:records]->(e), (e)-[:hasSentiment]->(sen:Sentiment)
+                      RETURN e.id AS id, o.id AS product, o.name AS name, e.summary AS summary, s.id AS span,
+                             sen.followUp AS followUp""", iid=interaction):
+        # the sentiment catalog decides: a negative experience is a service issue, a mixed one is clarified, others need none
+        verb = {"service issue": "Open service issue", "clarify with the advisor": "Clarify the reported experience"}.get(e["followUp"])
+        if not verb:
+            continue
         proposals.append({"id": f"ACT:{e['id']}", "interaction_id": interaction, "team": team, "created_by": user,
-                          "title": f"Open service issue: {e['summary']} ({e['name']})", "product": e["product"],
+                          "title": f"{verb}: {e['summary']} ({e['name']})", "product": e["product"],
                           "promotes": False, "addresses": [("ExperienceObservation", e["id"])], "sources": [e["span"]], "requires": [],
                           "fulfils": [], "due": date.fromordinal(at.toordinal() + 14)})
     return proposals[:3]

@@ -37,6 +37,7 @@ writes:
 - aai:concerns
 - aai:reportedBy
 - aai:affects
+- aai:hasSentiment
 - aai:Commitment
 - aai:AssetObservation
 - aai:measures
@@ -80,8 +81,8 @@ Decided by Dana Ortiz on 2026-03-20: reviewed. Source: `INT-2026-03-QBR-CR`.
 
 > investors keep calling her team about the CMP quarterly statements
 
-- Reads as: investor group: Investors still calling about CMP statements (Crestline Model Portfolios)
-- Writes: aai:ExperienceObservation, aai:concerns, aai:reportedBy, aai:affects, aai:supportedBy
+- Reads as: negative, investor group: Investors still calling about CMP statements (Crestline Model Portfolios)
+- Writes: aai:ExperienceObservation, aai:concerns, aai:reportedBy, aai:affects, aai:hasSentiment, aai:supportedBy
 - Decision: approved by Dana Ortiz on 2026-03-20
 
 ## CAND-03-3 · commitment status
@@ -98,4 +99,4 @@ Decided by Dana Ortiz on 2026-03-20: reviewed. Source: `INT-2026-03-QBR-CR`.
 
 - Reads as: reported AUM 320,000,000 USD, across all custodians
 - Writes: aai:AssetObservation, aai:measures, aai:reportedBy, aai:supportedBy, aai:evidenceType
-- Decision: approved by Dana Ortiz on 2026-03-20
+- Decision: rejected by Dana Ortiz: figure is approximate; ask for the ADV

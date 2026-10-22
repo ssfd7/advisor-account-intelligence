@@ -41,6 +41,7 @@ def bundle(g: Graph, roster: Roster, user: str, firm: str, advisor: str, at: dat
             items[did] = {"type": "discrepancy", "product": prod, "text": text}
     for e in q.experience(g, roster, user, firm, at, at):
         items[e["id"]] = {"type": "experience", "product": e["product"], "summary": e["summary"], "affected": e["affected"],
+                          "sentiment": e["sentiment"],
                           "reported_by": e["reportedBy"], "evidence": e["evidence"], "date": str(e["date"]),
                           "repeated_in": e["repeated_in"]}
     for i in q.intents(g, roster, user, firm, at, at):
@@ -76,7 +77,7 @@ def one_page(items: dict, firm_name: str, at: date) -> list:
     lines = [f"Brief for {items['ADVISOR']['name']}, {firm_name}, {at}"]
     lines.append("Uses:  " + "; ".join(f"{v['product']} {v['state']} [{k}]" for k, v in by("product state")))
     lines += [f"       discrepancy: {v['text']} [{k}]" for k, v in by("discrepancy")]
-    lines += [f"Said:  {v['summary']} ({v['affected']}, {v['evidence']} by {v['reported_by']}, {v['date']}"
+    lines += [f"Said:  {v['summary']} ({v['sentiment']}; {v['affected']}, {v['evidence']} by {v['reported_by']}, {v['date']}"
               + (f"; repeated in {', '.join(v['repeated_in'])}" if v["repeated_in"] else "") + f") [{k}]" for k, v in by("experience")]
     lines += [f"Wants: {v['intent']} {v['target']}: {v['reason']} [{k}]" for k, v in by("current intent")]
     lines += [f"Owe:   {v['summary']}, due {v['due']}, {v['status']} [{k}]" for k, v in by("commitment")]

@@ -1,0 +1,30 @@
+# Sentiment catalog: how an experience with a product is reported. Steward: Business analysis.
+# Sentiment belongs to an experience observation, as reported by its speaker; it is testimony, not a measured outcome.
+# follow_up says what the procedure proposes for an experience with this sentiment.
+version: 1
+concepts:
+  - id: SEN-01
+    label: negative
+    definition: The speaker reports a problem, frustration or cost with the product.
+    examples: ["investors keep calling her team about the CMP quarterly statements"]
+    follow_up: service issue
+  - id: SEN-02
+    label: positive
+    definition: The speaker reports that the product works well or meets the need.
+    examples: ["Custody with Crestline is working well and is not under review"]
+    follow_up: none
+  - id: SEN-03
+    label: mixed
+    definition: The speaker reports both a problem and a benefit in the same statement.
+    examples: ["The portal is useful, but the statements still confuse investors"]
+    follow_up: clarify with the advisor
+  - id: SEN-04
+    label: neutral
+    definition: The speaker describes use without judging it.
+    examples: ["We use CMP for about forty households"]
+    follow_up: none
+  - id: SEN-05
+    label: not recorded
+    definition: No sentiment was captured for this experience, for example from an extraction made before the catalog existed.
+    examples: []
+    follow_up: none

@@ -73,11 +73,14 @@ def load(g: Graph, store: TaskStore, data: Path = DATA, extractions: str = "extr
         for q in o.get("prerequisites", []):
             g.node("Prerequisite", q["id"], name=q["name"])
             g.link("ProductOffering", o["id"], "hasPrerequisite", "Prerequisite", q["id"])
-    taxonomy = yaml.safe_load((ref / "taxonomy.yaml").read_text())
+    taxonomy = yaml.safe_load((ref / "intents.yaml").read_text())
     concept_ids = {}
     for c in taxonomy["concepts"]:
         g.node("IntentConcept", c["id"], label=c["label"], taxonomyVersion=taxonomy["version"])
         concept_ids[c["label"]] = c["id"]
+    sentiments = yaml.safe_load((ref / "sentiments.yaml").read_text())
+    for s in sentiments["concepts"]:
+        g.node("Sentiment", s["id"], label=s["label"], followUp=s["follow_up"], catalogVersion=str(sentiments["version"]))
     for rid, name in store.roster.reps.items():
         g.node("Rep", rid, name=name)
     for t in store.roster.teams.values():

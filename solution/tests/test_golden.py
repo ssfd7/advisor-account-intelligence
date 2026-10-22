@@ -5,6 +5,7 @@
 from datetime import date
 
 import pytest
+import yaml
 
 from aai import queries as q
 from aai.bundle import check
@@ -231,3 +232,27 @@ def test_unauthorized_firm_is_excluded(world):
 
 def test_okf_bundle_is_consistent():
     assert check() == []
+
+
+# ------------------------------------------------------------ reference catalogs
+
+def test_sentiment_catalog_is_in_the_graph_and_linked(world):
+    g = world["g"]
+    assert {r["l"] for r in g.run("MATCH (s:Sentiment) RETURN s.label AS l")} == {"negative", "positive", "mixed", "neutral", "not recorded"}
+    linked = g.one("MATCH (:ExperienceObservation {id: 'CAND-01-5'})-[:hasSentiment]->(s:Sentiment) RETURN s.label AS l")
+    assert linked["l"] == "positive"
+
+
+def test_praise_gets_no_service_issue_and_problems_do(world):
+    ids = {a["id"] for a in world["store"].actions()}
+    assert "ACT:CAND-01-5" not in ids and "ACT:CAND-01-1" in ids
+
+
+def test_intent_findings_use_the_intent_catalog(world):
+    from aai import DATA
+    catalog = {c["label"]: c for c in yaml.safe_load((DATA / "reference" / "intents.yaml").read_text())["concepts"]}
+    for path in (DATA / "salesforce" / "extractions").glob("*.yaml"):
+        for c in yaml.safe_load(path.read_text()).get("candidates") or []:
+            if c["kind"] == "intent":
+                assert c["concept"] in catalog
+                assert c.get("proposes_state") in (None, catalog[c["concept"]]["proposes_state"])

@@ -119,6 +119,12 @@ mappings:
 - term: aai:IntentConcept
   node: IntentConcept
   key: id
+- term: aai:Sentiment
+  node: Sentiment
+  key: id
+  properties:
+    aai:followUp: followUp
+    aai:catalogVersion: catalogVersion
 - term: aai:Commitment
   node: Commitment
   key: id
@@ -295,6 +301,10 @@ mappings:
   edge: classifiedAs
   between:
   - Intent -> IntentConcept
+- term: aai:hasSentiment
+  edge: hasSentiment
+  between:
+  - ExperienceObservation -> Sentiment
 - term: aai:ownedByTeam
   edge: ownedByTeam
   between:

@@ -15,10 +15,10 @@
 <https://w3id.org/aai/ontology> a owl:Ontology ;
     dcterms:title "Advisor Account Intelligence ontology"@en ;
     dcterms:description "Structural semantic model of advisors, firms, platforms, product relationships, QBR interactions, experience, intent and team-owned follow-up work. Formal counterpart of aai-model.drawio."@en ;
-    dcterms:created "2026-10-21"^^xsd:date ;
-    dcterms:modified "2026-10-21"^^xsd:date ;
-    owl:versionInfo "0.2" ;
-    owl:versionIRI <https://w3id.org/aai/ontology/0.2> ;
+    dcterms:created "2026-10-22"^^xsd:date ;
+    dcterms:modified "2026-10-22"^^xsd:date ;
+    owl:versionInfo "0.3" ;
+    owl:versionIRI <https://w3id.org/aai/ontology/0.3> ;
     vann:preferredNamespacePrefix "aai" ;
     vann:preferredNamespaceUri "https://w3id.org/aai/ontology#" .
 
@@ -159,6 +159,11 @@ aai:AffectedGroup a owl:Class ;
 aai:Intent a owl:Class ;
     rdfs:label "Intent"@en ;
     skos:definition "A stated business intention toward a product offering, with desired outcome, reason or blocker, and date."@en .
+
+aai:Sentiment a owl:Class ;
+    rdfs:subClassOf skos:Concept ;
+    rdfs:label "Sentiment"@en ;
+    skos:definition "How the speaker judges an experience with a product: negative, positive, mixed, neutral or not recorded. Testimony, not a measured outcome."@en .
 
 aai:IntentConcept a owl:Class ;
     rdfs:subClassOf skos:Concept ;
@@ -372,6 +377,12 @@ aai:affects a owl:ObjectProperty ;
     rdfs:domain aai:ExperienceObservation ;
     rdfs:range aai:AffectedGroup ;
     skos:definition "Links an experience observation to the group whose experience it describes."@en .
+
+aai:hasSentiment a owl:ObjectProperty , owl:FunctionalProperty ;
+    rdfs:label "hasSentiment"@en ;
+    rdfs:domain aai:ExperienceObservation ;
+    rdfs:range aai:Sentiment ;
+    skos:definition "Links an experience observation to the sentiment its speaker expressed, from the sentiment catalog."@en .
 
 aai:supportedBy a owl:ObjectProperty ;
     rdfs:label "supportedBy"@en ;
@@ -749,6 +760,12 @@ aai:procedureVersion a owl:DatatypeProperty ;
     rdfs:range xsd:string ;
     skos:definition "Approved version of the procedure."@en .
 
+aai:followUp a owl:DatatypeProperty ;
+    rdfs:label "followUp"@en ;
+    rdfs:domain aai:Sentiment ;
+    rdfs:range xsd:string ;
+    skos:definition "What the follow-up procedure proposes for an experience with this sentiment, such as a service issue or none."@en .
+
 #################################################################
 # Code lists
 #################################################################
@@ -810,6 +827,29 @@ aai:AffectedGroup_investorGroup a aai:AffectedGroup ;
     skos:prefLabel "investor group"@en ;
     skos:inScheme aai:AffectedGroupScheme .
 
+aai:SentimentScheme a skos:ConceptScheme ;
+    skos:prefLabel "Sentiment codes"@en .
+
+aai:Sentiment_negative a aai:Sentiment ;
+    skos:prefLabel "negative"@en ;
+    skos:inScheme aai:SentimentScheme .
+
+aai:Sentiment_positive a aai:Sentiment ;
+    skos:prefLabel "positive"@en ;
+    skos:inScheme aai:SentimentScheme .
+
+aai:Sentiment_mixed a aai:Sentiment ;
+    skos:prefLabel "mixed"@en ;
+    skos:inScheme aai:SentimentScheme .
+
+aai:Sentiment_neutral a aai:Sentiment ;
+    skos:prefLabel "neutral"@en ;
+    skos:inScheme aai:SentimentScheme .
+
+aai:Sentiment_notRecorded a aai:Sentiment ;
+    skos:prefLabel "not recorded"@en ;
+    skos:inScheme aai:SentimentScheme .
+
 aai:IntentTaxonomyV1 a aai:TaxonomyVersion ;
     skos:prefLabel "Intent taxonomy, seed version 1"@en .
 
@@ -856,7 +896,7 @@ aai:IntentConcept_unknown a aai:IntentConcept ;
     skos:inScheme aai:IntentTaxonomyV1 .
 
 #################################################################
-# Steward and lifecycle status (all terms proposed in v0.2)
+# Steward and lifecycle status (all terms proposed in v0.3)
 #################################################################
 
 aai:Party aai:steward "Data stewardship" ; aai:termStatus "proposed" .
@@ -884,6 +924,7 @@ aai:SourceSpan aai:steward "Data stewardship" ; aai:termStatus "proposed" .
 aai:ExperienceObservation aai:steward "Business analysis" ; aai:termStatus "proposed" .
 aai:AffectedGroup aai:steward "Business analysis" ; aai:termStatus "proposed" .
 aai:Intent aai:steward "Business analysis" ; aai:termStatus "proposed" .
+aai:Sentiment aai:steward "Business analysis" ; aai:termStatus "proposed" .
 aai:IntentConcept aai:steward "Business analysis" ; aai:termStatus "proposed" .
 aai:TaxonomyVersion aai:steward "Business analysis" ; aai:termStatus "proposed" .
 aai:Commitment aai:steward "Business analysis" ; aai:termStatus "proposed" .
@@ -922,6 +963,7 @@ aai:records aai:steward "Data stewardship" ; aai:termStatus "proposed" .
 aai:expresses aai:steward "Data stewardship" ; aai:termStatus "proposed" .
 aai:concerns aai:steward "Data stewardship" ; aai:termStatus "proposed" .
 aai:affects aai:steward "Data stewardship" ; aai:termStatus "proposed" .
+aai:hasSentiment aai:steward "Data stewardship" ; aai:termStatus "proposed" .
 aai:supportedBy aai:steward "Data stewardship" ; aai:termStatus "proposed" .
 aai:expressedBy aai:steward "Data stewardship" ; aai:termStatus "proposed" .
 aai:targets aai:steward "Data stewardship" ; aai:termStatus "proposed" .
@@ -984,3 +1026,4 @@ aai:approvalStatus aai:steward "Data stewardship" ; aai:termStatus "proposed" .
 aai:phrase aai:steward "Data stewardship" ; aai:termStatus "proposed" .
 aai:linkMethod aai:steward "Data stewardship" ; aai:termStatus "proposed" .
 aai:procedureVersion aai:steward "Data stewardship" ; aai:termStatus "proposed" .
+aai:followUp aai:steward "Data stewardship" ; aai:termStatus "proposed" .
