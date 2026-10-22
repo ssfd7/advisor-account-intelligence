@@ -82,12 +82,22 @@ def render(store: TaskStore, roster: Roster, meta: dict, body: str, firm_name: s
         "supports": ["CQ1", "CQ3", "CQ4", "CQ6"],
     }
     out = ["---", yaml.safe_dump(front, sort_keys=False, allow_unicode=True).rstrip(), "---", ""]
+    hints = unlinked_findings(cands, det["mentions"], body)
+    for c in cands:
+        if c["kind"] == "experience" and not c["payload"].get("sentiment"):
+            hints[c["id"]] = (hints[c["id"]] + "; " if c["id"] in hints else "") + \
+                "no sentiment recorded, so no follow-up will be proposed; re-extract or note it"
+    described = {c["id"]: describe(c, names, roster) for c in cands}
+    tips = {cid: f"{dict((c['id'], c['kind']) for c in cands)[cid].replace('_', ' ').capitalize()}: {w}. "
+                 f"{d[0].upper() + d[1:]}." + (f" Hint: {hints[cid]}." if cid in hints else "") + " Click to review."
+            for cid, (w, d) in described.items()}
     lead = (f"Draft until an SME approves it; only approved findings enter memory." if status == "draft" else
             f"Decided by {roster.reps.get(item['resolved_by'], item['resolved_by'])} on {item['resolved_at']}: {item['status']}"
             + (f" ({item['note']})." if item["note"] else "."))
     out += [f"{lead} Source: `{iid}`.", "", "# Note", "",
-            "The note as saved. Each finding's sentence is in bold, followed by the finding's id.", "",
-            *[f"> {line}" if line else ">" for line in marked(body, cands).strip().splitlines()],
+            "The note as saved. Each finding's sentence is in bold and links to the finding below; hover it to see "
+            "what it says and its status.", "",
+            *[f"> {line}" if line else ">" for line in marked(body, cands, tips).strip().splitlines()],
             "", "# Product mentions", "",
             "| Phrase | In the sentence | Linked to | How |", "|---|---|---|---|"]
     for m in det["mentions"]:
@@ -101,34 +111,47 @@ def render(store: TaskStore, roster: Roster, meta: dict, body: str, firm_name: s
                 *[f"  - Rule `{r['id']}`: {r['rule']}" for r in _rules()],
                 f"  - Sentence: \"{_span(body, *a.sentence)}\""]
     out += ["", "# Findings", ""]
-    hints = unlinked_findings(cands, det["mentions"], body)
     for c in cands:
+        what, decision = described[c["id"]]
         p = c["payload"]
-        what = {"experience": lambda: f"{p.get('sentiment') or 'sentiment not recorded'}, {p.get('affected')}: {p.get('summary')} "
-                                      f"({names.get(p.get('product'), p.get('product'))})",
-                "intent": lambda: f"{names.get(p.get('concept'), p.get('concept'))} → {names.get(p.get('target'), p.get('target'))}"
-                                  + (f"; proposes state `{p['proposes_state']}`" if p.get("proposes_state") else ""),
-                "commitment": lambda: f"{p.get('summary')}, due {p.get('due')}",
-                "commitment_status": lambda: f"{p.get('commitment')} is {p.get('status')}",
-                "asset": lambda: f"{p.get('metric')} {p.get('value'):,.0f} {p.get('currency')}, {p.get('scope')}"}[c["kind"]]()
-        decision = {"candidate": "pending SME approval",
-                    "confirmed": f"approved by {roster.reps.get(c['decided_by'], c['decided_by'])} on {c['decided_at']}",
-                    "rejected": f"rejected by {roster.reps.get(c['decided_by'], c['decided_by'])}: {c['reason']}",
-                    "repetition": f"repetition of `{c['quotes']}`; linked, not counted as new evidence"}[c["status"]]
         text = p.get("span") or (_span(body, *map(int, c["span_id"].split("#")[1].split("-"))) if c["span_id"] else "")
-        out += [f"## {c['id']} · {c['kind'].replace('_', ' ')}", "", f"> {text}", "", f"- Reads as: {what}",
-                f"- Writes: {', '.join(WRITES[c['kind']])}", f"- Decision: {decision}"]
-        if c["kind"] == "experience" and not p.get("sentiment"):
-            hints[c["id"]] = (hints.get(c["id"], "") + "; " if c["id"] in hints else "") + \
-                "no sentiment recorded, so no follow-up will be proposed; re-extract or note it"
+        out += [f'<a id="{_anchor(c["id"])}"></a>', "", f"## {c['id']} · {c['kind'].replace('_', ' ')}", "", f"> {text}", "",
+                f"- Reads as: {what}", f"- Writes: {', '.join(WRITES[c['kind']])}", f"- Decision: {decision}"]
         if c["id"] in hints:
             out.append(f"- Hint for the SME: {hints[c['id']]}")
-        out.append("")
+        out += ["", "[Back to the note](#note)", ""]
     return "\n".join(out)
 
 
-def marked(body: str, cands: list) -> str:
-    """The note with each finding's span in bold and tagged with its id; overlapping spans keep the first."""
+def describe(c: dict, names: dict, roster: Roster) -> tuple:
+    """What a finding says, and where its decision stands, in plain words."""
+    p = c["payload"]
+    what = {"experience": lambda: f"{p.get('sentiment') or 'sentiment not recorded'}, {p.get('affected')}: {p.get('summary')} "
+                                  f"({names.get(p.get('product'), p.get('product'))})",
+            "intent": lambda: f"{names.get(p.get('concept'), p.get('concept'))} → {names.get(p.get('target'), p.get('target'))}"
+                              + (f"; proposes state `{p['proposes_state']}`" if p.get("proposes_state") else ""),
+            "commitment": lambda: f"{p.get('summary')}, due {p.get('due')}",
+            "commitment_status": lambda: f"{p.get('commitment')} is {p.get('status')}",
+            "asset": lambda: f"{p.get('metric')} {p.get('value'):,.0f} {p.get('currency')}, {p.get('scope')}"}[c["kind"]]()
+    who = roster.reps.get(c["decided_by"], c["decided_by"])
+    decision = {"candidate": "pending SME approval",
+                "confirmed": f"approved by {who} on {c['decided_at']}",
+                "rejected": f"rejected by {who}: {c['reason']}",
+                "repetition": f"repetition of `{c['quotes']}`; linked, not counted as new evidence"}[c["status"]]
+    return what, decision
+
+
+def _anchor(cid: str) -> str:
+    return cid.lower()
+
+
+def _title(text: str) -> str:
+    """Safe inside a Markdown link title."""
+    return text.replace('"', "'").replace("`", "")
+
+
+def marked(body: str, cands: list, tips: dict) -> str:
+    """The note with each finding's span in bold, linked to its section below with a tooltip; overlapping spans keep the first."""
     spans = []
     for c in cands:
         if c["span_id"]:
@@ -139,7 +162,7 @@ def marked(body: str, cands: list) -> str:
     for start, end, cid in sorted(spans):
         text = body[start:end]
         lead, core, trail = text[:len(text) - len(text.lstrip())], text.strip(), text[len(text.rstrip()):]
-        out += [body[pos:start], f"{lead}**{core}** `{cid}`{trail}"]
+        out += [body[pos:start], f'{lead}**[{core}](#{_anchor(cid)} "{_title(tips[cid])}")** `{cid}`{trail}']
         pos = end
     return "".join(out + [body[pos:]])
 

@@ -53,19 +53,19 @@ Decided by Dana Ortiz on 2026-03-20: reviewed. Source: `INT-2026-03-QBR-CR`.
 
 # Note
 
-The note as saved. Each finding's sentence is in bold, followed by the finding's id.
+The note as saved. Each finding's sentence is in bold and links to the finding below; hover it to see what it says and its status.
 
 > Quarterly review with Maya Chen, Cedar Ridge Advisory.
 >
-> **Maya is postponing the CPX UMA evaluation because the integration with her portfolio accounting system has not been verified.** `CAND-03-1`
+> **[Maya is postponing the CPX UMA evaluation because the integration with her portfolio accounting system has not been verified.](#cand-03-1 "Intent: postponing → CPX Unified Managed Account; proposes state paused. Approved by Dana Ortiz on 2026-03-20. Click to review.")** `CAND-03-1`
 >
-> Statements are still a problem: **investors keep calling her team about the CMP quarterly statements** `CAND-03-2`.
+> Statements are still a problem: **[investors keep calling her team about the CMP quarterly statements](#cand-03-2 "Experience: negative, investor group: Investors still calling about CMP statements (Crestline Model Portfolios). Approved by Dana Ortiz on 2026-03-20. Click to review.")** `CAND-03-2`.
 >
 > Crestline custody remains in active use.
 >
-> **The specialist session promised in January has not happened yet.** `CAND-03-3`
+> **[The specialist session promised in January has not happened yet.](#cand-03-3 "Commitment status: CAND-01-4 is open. Approved by Dana Ortiz on 2026-03-20. Click to review.")** `CAND-03-3`
 >
-> **Maya said Cedar Ridge's AUM is now about $320 million across all custodians.** `DET-INT-2026-03-QBR-CR-A1`
+> **[Maya said Cedar Ridge's AUM is now about $320 million across all custodians.](#det-int-2026-03-qbr-cr-a1 "Asset: reported AUM 320,000,000 USD, across all custodians. Approved by Dana Ortiz on 2026-03-20. Click to review.")** `DET-INT-2026-03-QBR-CR-A1`
 
 # Product mentions
 
@@ -85,6 +85,8 @@ The note as saved. Each finding's sentence is in bold, followed by the finding's
 
 # Findings
 
+<a id="cand-03-1"></a>
+
 ## CAND-03-1 · intent
 
 > Maya is postponing the CPX UMA evaluation because the integration with her portfolio accounting system has not been verified.
@@ -92,6 +94,10 @@ The note as saved. Each finding's sentence is in bold, followed by the finding's
 - Reads as: postponing → CPX Unified Managed Account; proposes state `paused`
 - Writes: aai:Intent, aai:targets, aai:considersAlternative, aai:classifiedAs, aai:supersedes, aai:supportedBy, aai:ProductStateRecord
 - Decision: approved by Dana Ortiz on 2026-03-20
+
+[Back to the note](#note)
+
+<a id="cand-03-2"></a>
 
 ## CAND-03-2 · experience
 
@@ -101,6 +107,10 @@ The note as saved. Each finding's sentence is in bold, followed by the finding's
 - Writes: aai:ExperienceObservation, aai:concerns, aai:reportedBy, aai:affects, aai:hasSentiment, aai:supportedBy
 - Decision: approved by Dana Ortiz on 2026-03-20
 
+[Back to the note](#note)
+
+<a id="cand-03-3"></a>
+
 ## CAND-03-3 · commitment status
 
 > The specialist session promised in January has not happened yet.
@@ -109,6 +119,10 @@ The note as saved. Each finding's sentence is in bold, followed by the finding's
 - Writes: aai:Commitment
 - Decision: approved by Dana Ortiz on 2026-03-20
 
+[Back to the note](#note)
+
+<a id="det-int-2026-03-qbr-cr-a1"></a>
+
 ## DET-INT-2026-03-QBR-CR-A1 · asset
 
 > Maya said Cedar Ridge's AUM is now about $320 million across all custodians.
@@ -116,3 +130,5 @@ The note as saved. Each finding's sentence is in bold, followed by the finding's
 - Reads as: reported AUM 320,000,000 USD, across all custodians
 - Writes: aai:AssetObservation, aai:measures, aai:reportedBy, aai:supportedBy, aai:evidenceType
 - Decision: approved by Dana Ortiz on 2026-03-20
+
+[Back to the note](#note)
