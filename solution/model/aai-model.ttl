@@ -740,7 +740,7 @@ aai:approvalStatus a owl:DatatypeProperty ;
     rdfs:label "approvalStatus"@en ;
     rdfs:domain aai:SemanticQBR ;
     rdfs:range xsd:string ;
-    skos:definition "Draft, verified or rejected. Only a person sets verified."@en .
+    skos:definition "Draft, partially verified while findings await an escalation expert, or verified. Only a person sets verified."@en .
 
 aai:phrase a owl:DatatypeProperty ;
     rdfs:label "phrase"@en ;
@@ -759,6 +759,12 @@ aai:procedureVersion a owl:DatatypeProperty ;
     rdfs:domain aai:Procedure ;
     rdfs:range xsd:string ;
     skos:definition "Approved version of the procedure."@en .
+
+aai:reviewComment a owl:DatatypeProperty ;
+    rdfs:label "reviewComment"@en ;
+    rdfs:domain [ a owl:Class ; owl:unionOf ( aai:AssetObservation aai:Commitment aai:ExperienceObservation aai:Intent ) ] ;
+    rdfs:range xsd:string ;
+    skos:definition "The SME's or escalation expert's comment on the finding, kept with it in memory."@en .
 
 aai:followUp a owl:DatatypeProperty ;
     rdfs:label "followUp"@en ;
@@ -1026,4 +1032,5 @@ aai:approvalStatus aai:steward "Data stewardship" ; aai:termStatus "proposed" .
 aai:phrase aai:steward "Data stewardship" ; aai:termStatus "proposed" .
 aai:linkMethod aai:steward "Data stewardship" ; aai:termStatus "proposed" .
 aai:procedureVersion aai:steward "Data stewardship" ; aai:termStatus "proposed" .
+aai:reviewComment aai:steward "Data stewardship" ; aai:termStatus "proposed" .
 aai:followUp aai:steward "Data stewardship" ; aai:termStatus "proposed" .

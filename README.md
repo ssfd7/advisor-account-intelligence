@@ -36,7 +36,7 @@ cd solution
 | Section | What you see |
 |---|---|
 | 1. The firm knows | "CPX UMA", "CMP", "Crestline custody" and Northfield's "their UMA" linked to the catalog; "separate accounts" left unresolved; "$320 million" read as stated AUM with its scope; Maya Chen and May Chen kept apart |
-| 2. Experts in control | The review waits for the SME, not the absent author; a rep and the team lead are refused; after Dana approves, the CPX UMA is paused with a discrepancy against the CRM, and the as-of view before approval is unchanged |
+| 2. Experts in control | The review waits for the SME, not the absent author; a rep and the team lead are refused; Dana approves with a comment and escalates the $320M figure to the data steward, who decides it the next day; after approval, the CPX UMA is paused with a discrepancy against the CRM, and the as-of view before approval is unchanged |
 | 3. No promise lost | The follow-up run's steps show as unowned while Jordan is on leave; Priya acts only after acknowledging; an overdue email review escalates; closing needs evidence |
 | 4. Prepared in minutes | One cited page: uses, said, wants, owed, next, checks |
 | 5. The wrong thing, avoided | The January comparison goes on hold because the advisor postponed; stated, reported and platform asset figures are not totalled; registration shown as unknown; an out-of-scope request refused |

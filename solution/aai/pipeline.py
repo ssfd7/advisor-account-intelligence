@@ -25,12 +25,12 @@ BUNDLE = SOLUTION / "bundle"
 PROCEDURE = BUNDLE / "procedures" / "qbr-understanding-and-follow-up.md"
 DRAFTS = STATE / "semantic-qbr"
 WRITES = {
-    "experience": ["aai:ExperienceObservation", "aai:concerns", "aai:reportedBy", "aai:affects", "aai:hasSentiment", "aai:supportedBy"],
+    "experience": ["aai:ExperienceObservation", "aai:concerns", "aai:reportedBy", "aai:affects", "aai:hasSentiment", "aai:supportedBy", "aai:reviewComment"],
     "intent": ["aai:Intent", "aai:targets", "aai:considersAlternative", "aai:classifiedAs", "aai:supersedes",
-               "aai:supportedBy", "aai:ProductStateRecord"],
-    "commitment": ["aai:Commitment", "aai:madeBy", "aai:dueDate"],
+               "aai:supportedBy", "aai:ProductStateRecord", "aai:reviewComment"],
+    "commitment": ["aai:Commitment", "aai:madeBy", "aai:dueDate", "aai:reviewComment"],
     "commitment_status": ["aai:Commitment"],
-    "asset": ["aai:AssetObservation", "aai:measures", "aai:reportedBy", "aai:supportedBy", "aai:evidenceType"],
+    "asset": ["aai:AssetObservation", "aai:measures", "aai:reportedBy", "aai:supportedBy", "aai:evidenceType", "aai:reviewComment"],
 }
 STOPPED = ("postponing", "rejecting or discontinuing")
 
@@ -60,13 +60,17 @@ def render(store: TaskStore, roster: Roster, meta: dict, body: str, firm_name: s
     iid, item, det, names = meta["interaction_id"], store.review_item(meta["interaction_id"]), detect(body), _names()
     team = roster.teams[meta["team"]]
     cands = store.candidates(iid)
-    status = {"pending review": "draft", "reviewed": "verified", "no action needed": "verified"}[item["status"]]
+    status = {"pending review": "draft", "awaiting expert": "partially verified", "reviewed": "verified",
+              "no action needed": "verified"}[item["status"]]
     writes = ["aai:SemanticQBR", "aai:interprets", "aai:ProductMention", "aai:foundIn", "aai:refersTo"]
     for c in cands:
         writes += [w for w in WRITES[c["kind"]] if w not in writes]
     review = {"owner": team.sme, "deadline": item["deadline"]}
     if item["resolved_by"]:
         review |= {"decided_by": item["resolved_by"], "decided_at": item["resolved_at"], "outcome": item["status"]}
+    waiting = [c for c in cands if c["status"] == "escalated"]
+    if waiting:
+        review["awaiting"] = [{"finding": c["id"], "expert": c["escalated_to"], "due": c["escalation_deadline"]} for c in waiting]
     front = {
         "type": "Semantic QBR",
         "title": f"Semantic QBR: {firm_name}, {meta['date']}",
@@ -92,6 +96,7 @@ def render(store: TaskStore, roster: Roster, meta: dict, body: str, firm_name: s
                  f"{d[0].upper() + d[1:]}." + (f" Hint: {hints[cid]}." if cid in hints else "") + " Click to review."
             for cid, (w, d) in described.items()}
     lead = (f"Draft until an SME approves it; only approved findings enter memory." if status == "draft" else
+            f"Partly decided: approved findings are in memory; {len(waiting)} finding(s) await an expert." if waiting else
             f"Decided by {roster.reps.get(item['resolved_by'], item['resolved_by'])} on {item['resolved_at']}: {item['status']}"
             + (f" ({item['note']})." if item["note"] else "."))
     out += [f"{lead} Source: `{iid}`.", "", "# Note", "",
@@ -133,11 +138,18 @@ def describe(c: dict, names: dict, roster: Roster) -> tuple:
             "commitment": lambda: f"{p.get('summary')}, due {p.get('due')}",
             "commitment_status": lambda: f"{p.get('commitment')} is {p.get('status')}",
             "asset": lambda: f"{p.get('metric')} {p.get('value'):,.0f} {p.get('currency')}, {p.get('scope')}"}[c["kind"]]()
-    who = roster.reps.get(c["decided_by"], c["decided_by"])
-    decision = {"candidate": "pending SME approval",
-                "confirmed": f"approved by {who} on {c['decided_at']}",
-                "rejected": f"rejected by {who}: {c['reason']}",
-                "repetition": f"repetition of `{c['quotes']}`; linked, not counted as new evidence"}[c["status"]]
+    name = lambda r: roster.reps.get(r, r)
+    decision = {"candidate": lambda: "pending SME approval",
+                "confirmed": lambda: f"approved by {name(c['decided_by'])} on {c['decided_at']}",
+                "rejected": lambda: f"rejected by {name(c['decided_by'])}: {c['reason']}",
+                "escalated": lambda: f"escalated by {name(c['escalated_by'])} to {name(c['escalated_to'])} "
+                                     f"({roster.roles[c['escalated_to']]}), due {c['escalation_deadline']}",
+                "repetition": lambda: f"repetition of `{c['quotes']}`; linked, not counted as new evidence"}[c["status"]]()
+    if c.get("escalated_by"):
+        decision = (f"escalated by {name(c['escalated_by'])}: \"{c['escalation_comment']}\"; " + decision
+                    if c["status"] != "escalated" else decision + f"; \"{c['escalation_comment']}\"")
+    if c.get("comment") and c["status"] != "rejected":
+        decision += f"; comment: \"{c['comment']}\""
     return what, decision
 
 
@@ -190,11 +202,11 @@ def add_asset_candidates(g: Graph, store: TaskStore, meta: dict, body: str):
 def approve(g: Graph, store: TaskStore, roster: Roster, interactions: dict, bodies: dict, firm_names: dict,
             rep: str, iid: str, at: date, decisions: dict, no_action_reason: str = None) -> dict:
     """The SME gate. Promote what the SME confirms, keep reasons for what they reject, then hydrate."""
-    if store.review_item(iid)["status"] != "pending review":
+    if store.review_item(iid)["status"] not in ("pending review", "awaiting expert"):
         return store.review_item(iid)
     item = store.resolve_review(rep, iid, at, decisions, promoter(g, interactions), no_action_reason)
     meta = interactions[iid]
-    hydrate(g, store, roster, meta, bodies[iid], rep, at, start_run=item["status"] == "reviewed")
+    hydrate(g, store, roster, meta, bodies[iid], rep, at, start_run=item["confirmed_now"] > 0)
     draft(store, roster, meta, bodies[iid], firm_names[meta["firm"]])
     return item
 
@@ -202,7 +214,7 @@ def approve(g: Graph, store: TaskStore, roster: Roster, interactions: dict, bodi
 def hydrate(g: Graph, store: TaskStore, roster: Roster, meta: dict, body: str, approver: str, at: date, start_run=True):
     iid, team = meta["interaction_id"], roster.teams[meta["team"]]
     sq = f"SQBR:{iid}"
-    g.node("SemanticQBR", sq, approvalStatus="verified", dueDate=date.fromisoformat(store.review_item(iid)["deadline"]),
+    g.node("SemanticQBR", sq, approvalStatus="partially verified" if store.review_item(iid)["status"] == "awaiting expert" else "verified", dueDate=date.fromisoformat(store.review_item(iid)["deadline"]),
            recordedAt=at, path=str((DRAFTS / f"{iid}.md").relative_to(SOLUTION)))
     g.link("SemanticQBR", sq, "interprets", "Interaction", iid)
     g.link("SemanticQBR", sq, "approvedBy", "Rep", approver)

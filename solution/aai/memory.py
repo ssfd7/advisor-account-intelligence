@@ -46,6 +46,12 @@ def add_state(g: Graph, sid: str, pr: str, state: str, source_type: str, valid_f
         g.link("Discrepancy", did, "involves", "ProductStateRecord", other["id"])
 
 
+def _comment(g: Graph, label: str, cand: dict):
+    """The reviewer's comment travels with the finding into memory."""
+    if cand.get("comment"):
+        g.run(f"MATCH (n:{label} {{id: $id}}) SET n.reviewComment = $c", id=cand["id"], c=cand["comment"])
+
+
 def promoter(g: Graph, interactions: dict):
     """Return the promote(candidate, reviewer, at) callback used by the task store."""
 
@@ -58,6 +64,7 @@ def promoter(g: Graph, interactions: dict):
             g.node("ExperienceObservation", cand["id"], summary=p.get("summary") or "", affectedGroup=p.get("affected"),
                    evidenceType=p.get("evidence_type") or "testimony", validFrom=valid, recordedAt=at, verificationState="validated")
             g.link("Interaction", iid, "records", "ExperienceObservation", cand["id"])
+            _comment(g, "ExperienceObservation", cand)
             g.link("ExperienceObservation", cand["id"], "concerns", "ProductOffering", p["product"])
             g.link("ExperienceObservation", cand["id"], "supportedBy", "SourceSpan", cand["span_id"])
             g.run("MATCH (e:ExperienceObservation {id: $e}), (s:Sentiment {label: $l}) MERGE (e)-[:hasSentiment]->(s)",
@@ -71,6 +78,7 @@ def promoter(g: Graph, interactions: dict):
             g.node("Intent", cand["id"], desiredOutcome=p.get("desired_outcome"), reasonOrBlocker=p.get("reason"),
                    validFrom=valid, recordedAt=at, verificationState="validated")
             g.link("Interaction", iid, "expresses", "Intent", cand["id"])
+            _comment(g, "Intent", cand)
             g.link("Intent", cand["id"], "targets", "ProductOffering", p["target"])
             if (p.get("speaker") or "").startswith("ADV-"):
                 g.link("Intent", cand["id"], "expressedBy", "Advisor", p["speaker"])
@@ -87,12 +95,14 @@ def promoter(g: Graph, interactions: dict):
         elif kind == "commitment":
             g.node("Commitment", cand["id"], summary=p.get("summary") or "", dueDate=date.fromisoformat(str(p["due"])) if p.get("due") else None, status="open", recordedAt=at)
             g.link("Interaction", iid, "records", "Commitment", cand["id"])
+            _comment(g, "Commitment", cand)
             g.link("Commitment", cand["id"], "madeBy", "Rep", p.get("made_by") or meta["author"])
         elif kind == "asset":  # an asset figure the advisor stated: testimony at its stated scope, never the firm's report
             g.node("AssetObservation", cand["id"], metricType=p["metric"], metricValue=float(p["value"]), currency=p["currency"],
                    scope=p["scope"], asOfDate=valid, methodology="stated by the advisor in a QBR", evidenceType="testimony",
                    recordedAt=at)
             g.link("AssetObservation", cand["id"], "measures", "Firm", meta["firm"])
+            _comment(g, "AssetObservation", cand)
             g.link("AssetObservation", cand["id"], "reportedBy", "Advisor", p["speaker"])
             g.link("AssetObservation", cand["id"], "supportedBy", "SourceSpan", cand["span_id"])
         elif kind == "commitment_status":

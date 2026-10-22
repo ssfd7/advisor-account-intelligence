@@ -79,6 +79,7 @@ mappings:
     aai:methodology: methodology
     aai:evidenceType: evidenceType
     aai:recordedAt: recordedAt
+    aai:reviewComment: reviewComment
 - term: aai:SourceRecord
   node: SourceRecord
   key: id
@@ -107,6 +108,7 @@ mappings:
     aai:validFrom: validFrom
     aai:recordedAt: recordedAt
     aai:verificationState: verificationState
+    aai:reviewComment: reviewComment
 - term: aai:Intent
   node: Intent
   key: id
@@ -116,6 +118,7 @@ mappings:
     aai:validFrom: validFrom
     aai:recordedAt: recordedAt
     aai:verificationState: verificationState
+    aai:reviewComment: reviewComment
 - term: aai:IntentConcept
   node: IntentConcept
   key: id
@@ -131,6 +134,7 @@ mappings:
   properties:
     aai:dueDate: dueDate
     aai:recordedAt: recordedAt
+    aai:reviewComment: reviewComment
 - term: aai:Action
   node: Action
   key: id

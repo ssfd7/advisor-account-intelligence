@@ -1,12 +1,12 @@
 # owner: the relationship manager who owns follow-up for the team's relationships.
-# sme: the subject-matter expert who approves findings before they enter memory.
+# sme: the subject-matter expert who approves findings before they enter memory. Other SMEs can take escalated findings.
 teams:
   - id: TEAM-CR
     name: Cedar Ridge relationship team
     lead: REP-LEE
     owner: REP-JORDAN
     sme: REP-DANA
-    members: [REP-JORDAN, REP-PRIYA, REP-LEE, REP-DANA]
+    members: [REP-JORDAN, REP-PRIYA, REP-LEE, REP-DANA, REP-RIA]
     relationships: [FIRM-001, ADV-001]
     review_days: 5
   - id: TEAM-NF
@@ -14,7 +14,7 @@ teams:
     lead: REP-SAM
     owner: REP-OMAR
     sme: REP-KAI
-    members: [REP-OMAR, REP-SAM, REP-KAI]
+    members: [REP-OMAR, REP-SAM, REP-KAI, REP-RIA]
     relationships: [FIRM-002, ADV-002]
     review_days: 5
 reps:
@@ -25,3 +25,4 @@ reps:
   - {id: REP-OMAR, name: Omar, role: relationship manager}
   - {id: REP-SAM, name: Sam, role: team lead}
   - {id: REP-KAI, name: Kai Moreno, role: product specialist, sme: true}
+  - {id: REP-RIA, name: Ria Patel, role: data steward, sme: true}

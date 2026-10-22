@@ -14,7 +14,7 @@ The product turns each QBR note into knowledge the firm can act on. This documen
 | 1 · Concept detection | agent | `aai/detect.py` | Product mentions linked to the catalog by name or alias, longest phrase first, whole words only; product words with no link marked unresolved; asset figures read with their metric and scope |
 | 2 · Candidate findings | agent | `aai/llm.py` or fixtures | Experience (with sentiment), intent and commitments, each with a span copied verbatim from the note. A span that is not verbatim is rejected before review; a quoted repetition is linked to its original |
 | 3 · Semantic QBR | agent | `aai/pipeline.py#draft` | One OKF concept (`status: draft`) with mentions, asset figures and findings, each tied to its sentence, and the ontology terms its findings would write |
-| 4 · SME approval | human | `aai/pipeline.py#approve` | Each finding confirmed or rejected with a reason; the file becomes `status: verified` |
+| 4 · SME approval | human | `aai/pipeline.py#approve` | Each finding confirmed, rejected with a reason, or escalated with a comment to a named expert; any decision may carry a comment. Approved findings go ahead; the file is `partially verified` until escalated findings are decided, then `verified` |
 | 5 · Hydration | agent | `aai/pipeline.py#hydrate` | Approved findings in the graph; the semantic QBR and its mentions as nodes; a procedure run with proposed actions owned by the relationship owner |
 | 6–8 · Follow-up | agent, then human | `aai/queries.py#propose_actions`, `aai/tasks.py` | Up to three actions grounded in approved findings; approved, dismissed with a reason, or completed with evidence |
 
@@ -59,6 +59,7 @@ Product state changes follow the rules in the product brief: a conversation can 
 | Work | Who may act | When they cannot |
 |---|---|---|
 | Approve findings | The team's SME; another SME holding an acknowledged assignment | The team lead may record "no action needed" with a reason or reassign, but cannot confirm findings |
+| Decide an escalated finding | Only the named expert (another SME, such as the data steward or a product specialist), within the review days | Overdue escalations go to the team lead; the finding stays out of memory until decided |
 | Approve, dismiss or complete an action | Its owner (the relationship owner) if available; a rep holding an acknowledged assignment; the team lead | A notification alone grants nothing |
 | Activate coverage | The team lead | |
 

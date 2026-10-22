@@ -5,6 +5,9 @@ Rules enforced here:
   not extraction found anything; an overdue review escalates to the team lead;
 - only an SME approves findings: the team's SME, or another SME holding an acknowledged assignment. The team lead
   can record a "no action needed" disposition or reassign, but cannot approve findings;
+- an SME may escalate a finding, with a comment, to a named expert (another SME); the rest of the review proceeds.
+  Only that expert decides the escalated finding, within the review days; an overdue escalation goes to the lead.
+  Comments on any decision are kept;
 - follow-up actions are steps of a procedure run, owned by the relationship owner. Only the available owner, a rep
   holding an acknowledged assignment, or the team lead may approve, dismiss or complete them;
 - an assignment is offered, then acknowledged; a notification alone never completes it; repeating either adds nothing;
@@ -21,7 +24,8 @@ SCHEMA = """
 CREATE TABLE IF NOT EXISTS review_items(interaction_id TEXT PRIMARY KEY, team TEXT, author TEXT, saved_at TEXT,
     deadline TEXT, status TEXT, resolved_by TEXT, resolved_at TEXT, note TEXT, escalated_at TEXT);
 CREATE TABLE IF NOT EXISTS candidates(id TEXT PRIMARY KEY, interaction_id TEXT, kind TEXT, payload TEXT, status TEXT,
-    span_id TEXT, quotes TEXT, decided_by TEXT, decided_at TEXT, reason TEXT);
+    span_id TEXT, quotes TEXT, decided_by TEXT, decided_at TEXT, reason TEXT, comment TEXT, escalated_by TEXT,
+    escalated_to TEXT, escalation_deadline TEXT, escalation_flagged_at TEXT, escalation_comment TEXT);
 CREATE TABLE IF NOT EXISTS runs(id TEXT PRIMARY KEY, procedure TEXT, version TEXT, interaction_id TEXT, started_at TEXT);
 CREATE TABLE IF NOT EXISTS actions(id TEXT PRIMARY KEY, interaction_id TEXT, run_id TEXT, title TEXT, payload TEXT, team TEXT,
     created_by TEXT, approved_by TEXT, assignee TEXT, status TEXT, due TEXT, evidence TEXT, closed_at TEXT, note TEXT);
@@ -89,6 +93,9 @@ class TaskStore:
             return "SME"
         if rep in self.roster.smes and self._acknowledged(rep, "review", interaction_id):
             return "covering SME"
+        if self._one("SELECT 1 FROM candidates WHERE interaction_id = ? AND status = 'escalated' AND escalated_to = ?",
+                     interaction_id, rep):
+            return "escalation expert"
         if rep == team.lead:
             return "team lead"
         raise NotAuthorized(f"{rep} cannot approve findings in {interaction_id}: only the team's SME, or another SME "
@@ -122,7 +129,7 @@ class TaskStore:
 
     def add_candidate(self, cid, interaction_id, kind, payload, span_id, quotes=None, rejected=None):
         status = "rejected" if rejected else "repetition" if quotes else "candidate"
-        self.db.execute("INSERT OR IGNORE INTO candidates VALUES (?, ?, ?, ?, ?, ?, ?, ?, NULL, ?)",
+        self.db.execute("INSERT OR IGNORE INTO candidates VALUES (?, ?, ?, ?, ?, ?, ?, ?, NULL, ?, NULL, NULL, NULL, NULL, NULL, NULL)",
                         (cid, interaction_id, kind, json.dumps(payload, default=str), status, span_id, quotes,
                          "system" if rejected else None, rejected))
         self.db.commit()
@@ -133,41 +140,71 @@ class TaskStore:
             r["payload"] = json.loads(r["payload"])
         return [r for r in rows if status is None or r["status"] == status]
 
+    @staticmethod
+    def _decision(value) -> dict:
+        """"confirm", any other text (a rejection reason), or {"decision": confirm|reject|escalate, "comment", "to"}."""
+        if isinstance(value, dict):
+            return {"comment": None, "to": None, "reason": None} | value
+        return {"decision": "confirm" if value == "confirm" else "reject", "reason": None if value == "confirm" else value,
+                "comment": None, "to": None}
+
     def resolve_review(self, rep, interaction_id, at: date, decisions: dict, promote, no_action_reason=None):
-        """Decide every open candidate: "confirm", or any other text as the rejection reason. Confirmed candidates are
-        promoted to memory by `promote`; rejected ones keep their reason. With nothing confirmed, a reason for
-        'no action needed' is required."""
+        """Decide every open finding: confirm, reject with a reason, or escalate to a named expert with a comment; any
+        decision may carry a comment. Confirmed findings are promoted to memory by `promote`. The review completes when
+        nothing is left with an expert; with nothing confirmed or escalated, a 'no action needed' reason is required.
+        The returned item carries `confirmed_now`, the number promoted by this call."""
         item = self.review_item(interaction_id)
         if item["status"] in ("reviewed", "no action needed"):
-            return item
+            return item | {"confirmed_now": 0}
         how = self.check_review_authority(rep, interaction_id, at)
-        open_ = self.candidates(interaction_id, "candidate")
+        if how == "escalation expert":
+            open_ = [c for c in self.candidates(interaction_id, "escalated") if c["escalated_to"] == rep]
+        else:
+            open_ = self.candidates(interaction_id, "candidate")
         missing = [c["id"] for c in open_ if c["id"] not in decisions]
         if missing:
-            raise ValueError(f"undecided candidates: {missing}")
-        if how == "team lead" and any(decisions[c["id"]] == "confirm" for c in open_):
-            raise NotAuthorized(f"{rep} is the team lead: only an SME approves findings; the lead can record "
+            raise ValueError(f"undecided findings: {missing}")
+        chosen = {c["id"]: self._decision(decisions[c["id"]]) for c in open_}
+        if how == "team lead" and any(d["decision"] != "reject" for d in chosen.values()):
+            raise NotAuthorized(f"{rep} is the team lead: only an SME approves or escalates findings; the lead can record "
                                 f"'no action needed' or reassign the review to another SME")
-        confirmed = 0
+        for cid, d in chosen.items():
+            if d["decision"] == "escalate":
+                if d["to"] not in self.roster.smes or d["to"] == rep or not d["comment"]:
+                    raise ValueError(f"{cid}: escalate to another SME, with a comment saying what they should decide")
+                if how == "escalation expert":
+                    raise ValueError(f"{cid}: the escalation expert decides the finding; to pass it on, ask the team lead")
+        confirmed = escalated = 0
+        days = self.roster.teams[item["team"]].review_days
         for c in open_:
-            decision = decisions[c["id"]]
-            if decision == "confirm":
-                promote(c, rep, at)
+            d = chosen[c["id"]]
+            if d["decision"] == "escalate":
+                self.db.execute("""UPDATE candidates SET status = 'escalated', escalation_comment = ?, escalated_by = ?, escalated_to = ?,
+                                   escalation_deadline = ? WHERE id = ?""",
+                                (d["comment"], rep, d["to"], str(at + timedelta(days=days)), c["id"]))
+                self.log(at, rep, "finding escalated", finding=c["id"], to=d["to"], comment=d["comment"])
+                escalated += 1
+                continue
+            if d["decision"] == "confirm":
+                promote(c | {"comment": d["comment"]}, rep, at)
                 confirmed += 1
                 status, reason = "confirmed", None
             else:
-                status, reason = "rejected", decision
-            self.db.execute("UPDATE candidates SET status = ?, decided_by = ?, decided_at = ?, reason = ? WHERE id = ?",
-                            (status, rep, str(at), reason, c["id"]))
-        if not confirmed and not no_action_reason:
+                status, reason = "rejected", d["reason"] or d["comment"]
+            self.db.execute("UPDATE candidates SET status = ?, decided_by = ?, decided_at = ?, reason = ?, comment = ? WHERE id = ?",
+                            (status, rep, str(at), reason, d["comment"], c["id"]))
+        waiting = len(self.candidates(interaction_id, "escalated"))
+        already = self._one("SELECT count(*) AS n FROM candidates WHERE interaction_id = ? AND status = 'confirmed'", interaction_id)["n"]
+        if not already and not waiting and not no_action_reason:
             raise ValueError("nothing confirmed: record an explicit 'no action needed' disposition with a reason")
-        status = "reviewed" if confirmed else "no action needed"
+        status = "awaiting expert" if waiting else "reviewed" if already else "no action needed"
+        done = status != "awaiting expert"
         self.db.execute("UPDATE review_items SET status = ?, resolved_by = ?, resolved_at = ?, note = ? WHERE interaction_id = ?",
-                        (status, rep, str(at), no_action_reason, interaction_id))
+                        (status, rep if done else None, str(at) if done else None, no_action_reason, interaction_id))
         self.db.commit()
-        self.log(at, rep, "review resolved", interaction=interaction_id, status=status, authority=how, confirmed=confirmed,
-                 rejected=len(open_) - confirmed)
-        return self.review_item(interaction_id)
+        self.log(at, rep, "review resolved" if done else "review partly decided", interaction=interaction_id, status=status,
+                 authority=how, confirmed=confirmed, escalated=escalated, rejected=len(open_) - confirmed - escalated)
+        return self.review_item(interaction_id) | {"confirmed_now": confirmed}
 
     # ------------------------------------------------------------ assignments and coverage
 
@@ -226,6 +263,12 @@ class TaskStore:
             self.db.execute("UPDATE assignments SET status = 'escalated' WHERE id = ?", (a["id"],))
             self.log(at, "system", "escalated to team lead", assignment=a["id"])
             escalated.append(a["id"])
+        for c in self._rows("""SELECT c.id, c.escalated_to, r.team FROM candidates c JOIN review_items r USING (interaction_id)
+                               WHERE c.status = 'escalated' AND c.escalation_deadline < ? AND c.escalation_flagged_at IS NULL""", str(at)):
+            self.db.execute("UPDATE candidates SET escalation_flagged_at = ? WHERE id = ?", (str(at), c["id"]))
+            self.log(at, "system", "escalated finding overdue; to team lead", finding=c["id"], expert=c["escalated_to"],
+                     lead=self.roster.teams[c["team"]].lead)
+            escalated.append(c["id"])
         for i in self._rows("SELECT * FROM review_items WHERE status = 'pending review' AND deadline < ? AND escalated_at IS NULL", str(at)):
             self.db.execute("UPDATE review_items SET escalated_at = ? WHERE interaction_id = ?", (str(at), i["interaction_id"]))
             self.log(at, "system", "review escalated to team lead", interaction=i["interaction_id"],
@@ -324,6 +367,12 @@ class TaskStore:
                         "due": i["deadline"], "overdue": i["deadline"] < str(at),
                         "handoff": ", ".join(f"{o['to_rep']}:{o['status']}" for o in offers)
                         or ("escalated to lead" if i["escalated_at"] else "-")})
+        for c in self._rows("""SELECT c.* FROM candidates c JOIN review_items r USING (interaction_id)
+                               WHERE r.team = ? AND c.status = 'escalated' ORDER BY c.id""", team_id):
+            out.append({"item": c["id"], "type": "escalated finding", "status": f"awaiting {self.roster.roles[c['escalated_to']]}",
+                        "owner": c["escalated_to"] if self.available(c["escalated_to"], at) else "UNOWNED",
+                        "due": c["escalation_deadline"], "overdue": c["escalation_deadline"] < str(at),
+                        "handoff": f"from {c['escalated_by']}" + (" (overdue: with lead)" if c["escalation_flagged_at"] else "")})
         for a in self._rows(f"SELECT * FROM actions WHERE team = ? AND status IN {OPEN} ORDER BY id", team_id):
             offers = self._rows("SELECT to_rep, status FROM assignments WHERE work_type = 'action' AND work_id = ?", a["id"])
             owner = a["assignee"] if self.available(a["assignee"], at) else "UNOWNED"

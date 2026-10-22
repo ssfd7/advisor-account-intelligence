@@ -334,10 +334,12 @@ ATTRIBUTES = {
     "catalogVersion": (["offering", "capability"], "string", "Approved catalog version the description comes from."),
     "conceptId": (["intentConcept"], "string", "Stable identifier of the taxonomy concept."),
     "alias": (["offering", "platform"], "string", "Another name for the offering or platform used by advisors or staff, approved in the catalog."),
-    "approvalStatus": (["semanticQbr"], "string", "Draft, verified or rejected. Only a person sets verified."),
+    "approvalStatus": (["semanticQbr"], "string", "Draft, partially verified while findings await an escalation expert, or verified. Only a person sets verified."),
     "phrase": (["mention"], "string", "The words in the source that name the product."),
     "linkMethod": (["mention"], "string", "How the mention was linked: catalog name, alias, or unresolved."),
     "procedureVersion": (["procedure"], "string", "Approved version of the procedure."),
+    "reviewComment": (["experience", "intent", "commitment", "assetObs"], "string",
+                      "The SME's or escalation expert's comment on the finding, kept with it in memory."),
     "followUp": (["sentiment"], "string", "What the follow-up procedure proposes for an experience with this sentiment, such as a service issue or none."),
 }
 

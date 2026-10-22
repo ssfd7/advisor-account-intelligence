@@ -30,5 +30,5 @@ Meanings from ontology version 0.3, [aai-model.ttl](../../model/aai-model.ttl). 
   - Meaning: Links a semantic QBR to the interaction it reads. Of `aai:SemanticQBR`. Value: `aai:Interaction`.
   - In the graph: a `interprets` edge, `SemanticQBR -> Interaction`.
 - **`aai:approvalStatus`** (attribute; proposed; steward: Data stewardship)
-  - Meaning: Draft, verified or rejected. Only a person sets verified. Of `aai:SemanticQBR`. Value: `xsd:string`.
+  - Meaning: Draft, partially verified while findings await an escalation expert, or verified. Only a person sets verified. Of `aai:SemanticQBR`. Value: `xsd:string`.
   - In the graph: `SemanticQBR.approvalStatus`.

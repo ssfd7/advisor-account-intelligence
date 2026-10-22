@@ -10,7 +10,7 @@ asks Claude for a cited brief and checks it before writing it to .data/briefs/.
 """
 import argparse
 import json
-from datetime import date
+from datetime import date, timedelta
 
 from . import GRAPH_DB, STATE, TASK_DB
 from . import queries as q
@@ -114,9 +114,23 @@ def main():
         refused("Alex Lee, team lead, approves findings",
                 lambda: approve(g, store, roster, interactions, bodies, firms, "REP-LEE", MAR, D20, decisions)),
     ])
-    item = approve(g, store, roster, interactions, bodies, firms, "REP-DANA", MAR, D20, decisions)
-    print(f"  20 March: Dana Ortiz (business analyst, SME) approves {len(decisions)} findings, each tied to its sentence: "
-          f"{item['status']}; the file is now status: verified")
+    asset = f"DET-{MAR}-A1"
+    experience = next((c["id"] for c in store.candidates(MAR, "candidate") if c["kind"] == "experience"), None)
+    dana = dict(decisions)
+    dana[asset] = {"decision": "escalate", "to": "REP-RIA",
+                   "comment": "Stated $320M differs from the firm's reported $300M; decide whether it enters memory as her statement"}
+    if experience:
+        dana[experience] = {"decision": "confirm", "comment": "Same complaint as January; check the explainer reached investors"}
+    item = approve(g, store, roster, interactions, bodies, firms, "REP-DANA", MAR, D20, dana)
+    print(f"  20 March: Dana Ortiz (business analyst, SME) approves {len(decisions) - 1} findings, one with a comment, and "
+          f"escalates the $320M AUM figure to Ria Patel (data steward): {item['status']}")
+    for r in store.queue("TEAM-CR", D20):
+        if r["type"] == "escalated finding":
+            print(f"  queue: {r['item']}  {r['status']}, owner {r['owner']}, due {r['due']} ({r['handoff']})")
+    print("  approved findings are already in memory and their follow-up has started; the figure is not")
+    item = approve(g, store, roster, interactions, bodies, firms, "REP-RIA", MAR, D20 + timedelta(days=1),
+                   {asset: {"decision": "confirm", "comment": "Accept as her statement: it stays testimony, never merged with reported AUM"}})
+    print(f"  21 March: Ria confirms it, with her reason: {item['status']}; the semantic QBR is now status: verified")
     print("  what memory says on 20 March:")
     for prod in ("CCC", "CMP", "CPX-UMA"):
         state_line(g, roster, prod, D20)
@@ -174,7 +188,7 @@ def main():
     held = store.actions("on hold")
     for a in held:
         print(f"  on hold: {a['id']} '{a['title']}'\n           because the {a['note']}")
-    obs = q.assets(g, roster, "REP-PRIYA", "FIRM-001", D20)
+    obs = q.assets(g, roster, "REP-PRIYA", "FIRM-001", D27)  # after Ria approved the stated figure
     table(obs, ["id", "metric", "value", "scope", "asOf", "reporter", "methodology"])
     combined = q.combine_assets(obs)
     print(f"  total of these figures allowed: {combined['allowed']}")

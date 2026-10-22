@@ -256,3 +256,59 @@ def test_intent_findings_use_the_intent_catalog(world):
             if c["kind"] == "intent":
                 assert c["concept"] in catalog
                 assert c.get("proposes_state") in (None, catalog[c["concept"]]["proposes_state"])
+
+
+# ------------------------------------------------------------ SME comments and escalation
+
+@pytest.fixture
+def escalated(tmp_path):
+    roster = Roster()
+    g, s = Graph(tmp_path / "g.lbug", fresh=True), TaskStore(tmp_path / "t.sqlite", roster, fresh=True)
+    r = load(g, s)
+    run = lambda rep, at, decisions: approve(g, s, roster, r["interactions"], r["bodies"], r["firm_names"], rep, MAR, at, decisions)
+    asset = f"DET-{MAR}-A1"
+    decisions = {c["id"]: "confirm" for c in s.candidates(MAR, "candidate")}
+    decisions["CAND-03-2"] = {"decision": "confirm", "comment": "same complaint as January"}
+    decisions[asset] = {"decision": "escalate", "to": "REP-RIA", "comment": "check against the ADV"}
+    item = run("REP-DANA", D20, decisions)
+    return {"g": g, "s": s, "run": run, "asset": asset, "item": item}
+
+
+def test_escalation_keeps_the_finding_out_of_memory_but_lets_the_rest_through(escalated):
+    g, asset = escalated["g"], escalated["asset"]
+    assert escalated["item"]["status"] == "awaiting expert"
+    assert not g.one("MATCH (o:AssetObservation {id: $id}) RETURN o.id AS id", id=asset)
+    assert g.one("MATCH (n:Intent {id: 'CAND-03-1'}) RETURN n.id AS id")
+    assert escalated["s"].actions(), "the follow-up run starts on the approved findings"
+
+
+def test_comment_travels_into_memory(escalated):
+    row = escalated["g"].one("MATCH (e:ExperienceObservation {id: 'CAND-03-2'}) RETURN e.reviewComment AS c")
+    assert row["c"] == "same complaint as January"
+
+
+def test_only_the_named_expert_decides_an_escalated_finding(escalated):
+    asset = escalated["asset"]
+    with pytest.raises(NotAuthorized):
+        escalated["run"]("REP-PRIYA", D20, {asset: "confirm"})
+    rows = {r["item"]: r for r in escalated["s"].queue("TEAM-CR", D20)}
+    assert rows[asset]["owner"] == "REP-RIA" and rows[asset]["status"] == "awaiting data steward"
+    item = escalated["run"]("REP-RIA", D23, {asset: {"decision": "confirm", "comment": "accept as testimony"}})
+    assert item["status"] == "reviewed"
+    (c,) = [c for c in escalated["s"].candidates(MAR) if c["id"] == asset]
+    assert (c["escalation_comment"], c["comment"], c["decided_by"]) == ("check against the ADV", "accept as testimony", "REP-RIA")
+
+
+def test_escalation_needs_a_comment_and_another_sme(tmp_path):
+    roster = Roster()
+    g, s = Graph(tmp_path / "g.lbug", fresh=True), TaskStore(tmp_path / "t.sqlite", roster, fresh=True)
+    r = load(g, s)
+    decisions = {c["id"]: "confirm" for c in s.candidates(MAR, "candidate")}
+    for bad in ({"decision": "escalate", "to": "REP-RIA"}, {"decision": "escalate", "to": "REP-PRIYA", "comment": "x"}):
+        with pytest.raises(ValueError):
+            approve(g, s, roster, r["interactions"], r["bodies"], r["firm_names"], "REP-DANA", MAR, D20,
+                    decisions | {f"DET-{MAR}-A1": bad})
+
+
+def test_overdue_escalation_goes_to_the_lead(escalated):
+    assert escalated["asset"] in escalated["s"].escalate_overdue(date(2026, 3, 26))

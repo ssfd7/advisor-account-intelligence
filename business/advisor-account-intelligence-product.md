@@ -30,9 +30,9 @@ The root cause is that the note is text the firm cannot read: it does not link "
 | Role | In the product |
 |---|---|
 | Relationship manager | Owns follow-up for assigned firms; prepares from the one-page brief; covers for a colleague when the lead asks |
-| SME (business analyst or product specialist) | Approves or rejects each finding in a semantic QBR, within a review deadline |
+| SME (business analyst or product specialist) | Approves, rejects or escalates each finding in a semantic QBR, within a review deadline, with comments kept in memory |
 | Team lead | Accountable for unreviewed QBRs and unowned work; activates coverage; receives escalations; can close a review as "no action needed" with a reason |
-| Data steward and product specialists | Own identities, asset definitions, the catalog and its aliases |
+| Data steward and product specialists | Own identities, asset definitions, the catalog and its aliases; decide findings an SME escalates to them |
 | Compliance reviewer | Approves advisor-facing comparisons before they are shared |
 
 ## 5. The scenario
@@ -42,7 +42,7 @@ All names are fictional. Crestline is the firm; its catalog lists Crestline Cust
 1. **January QBR.** Maya Chen of Cedar Ridge Advisory says her investors find the CMP statements hard to understand, and that she is considering "the UMA on Crestline Portfolio Exchange". Jordan, her relationship manager, promises a specialist session. Dana, the team's SME, approves the findings; Jordan approves a comparison and dismisses two minor actions with a reason.
 2. **February email.** Jordan forwards the January note. It is a repetition, not new evidence; its review goes overdue and escalates to the team lead.
 3. **March QBR.** Maya is postponing the CPX UMA evaluation because her portfolio accounting integration is unverified; investors still call about statements; she says Cedar Ridge's AUM is "about $320 million". The CRM still says the evaluation is pilot-ready. Jordan saves the note and goes on leave the next day.
-4. **What happens.** The review waits for Dana, not Jordan. Dana approves; memory now says "paused", with a discrepancy against the CRM. The follow-up run's steps are Jordan's, so they show as unowned; the lead offers them to Priya, who acts only after acknowledging. The January comparison goes on hold: it would pitch a postponed product. The $320 million stays Maya's statement, apart from the firm's reported $300M AUM and the platform's $180M AUA, and nothing is totalled. Maya's registration is shown as unknown despite her passed exams. Priya closes the service issue with evidence; the integration review stays open and owned.
+4. **What happens.** The review waits for Dana, not Jordan. Dana approves three findings, comments on one, and escalates the $320M figure to Ria, the data steward, who accepts it the next day as Maya's statement. Memory now says "paused", with a discrepancy against the CRM. The follow-up run's steps are Jordan's, so they show as unowned; the lead offers them to Priya, who acts only after acknowledging. The January comparison goes on hold: it would pitch a postponed product. The $320 million stays Maya's statement, apart from the firm's reported $300M AUM and the platform's $180M AUA, and nothing is totalled. Maya's registration is shown as unknown despite her passed exams. Priya closes the service issue with evidence; the integration review stays open and owned.
 
 A second firm, Northfield Wealth Partners, has an advisor named May Chen. Her records stay separate and outside Cedar Ridge's team's access; her note mentions "their UMA" (linked) and "separate accounts" (left unresolved for the SME).
 

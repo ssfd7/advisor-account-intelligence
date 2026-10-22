@@ -1,7 +1,7 @@
 ---
 type: Tool
 title: Approve the semantic QBR
-description: The SME confirms or rejects each finding, with a reason for each rejection.
+description: The SME confirms, rejects with a reason, or escalates each finding to a named expert with a comment; any decision may carry a comment.
 status: draft
 performed_by: human
 implemented_by: aai/pipeline.py#approve
@@ -9,6 +9,7 @@ writes:
 - aai:SemanticQBR
 - aai:approvedBy
 - aai:approvalStatus
+- aai:reviewComment
 supports:
 - CQ6
 - PROC-QBR.4
@@ -17,7 +18,7 @@ generated:
   at: '2026-10-21T12:00:00Z'
 ---
 
-Only the team's SME, or another SME holding an acknowledged assignment, may confirm findings. The team lead may record "no action needed" with a reason, or reassign.
+Only the team's SME, or another SME holding an acknowledged assignment, may confirm findings. An escalated finding stays out of memory until the named expert (another SME) decides it, within the review days; the rest of the review proceeds and its follow-up starts. Overdue escalations go to the team lead. Comments are kept with the finding in memory (`reviewComment`), and the escalation comment is kept beside the expert's. The team lead may record "no action needed" with a reason, or reassign.
 
 # Glossary
 
@@ -30,5 +31,8 @@ Meanings from ontology version 0.3, [aai-model.ttl](../../model/aai-model.ttl). 
   - Meaning: Links an action or semantic QBR to the rep who approved it. Of `aai:Action`, `aai:SemanticQBR`. Value: `aai:Rep`.
   - In the graph: a `approvedBy` edge, `Action -> Rep`; `SemanticQBR -> Rep`.
 - **`aai:approvalStatus`** (attribute; proposed; steward: Data stewardship)
-  - Meaning: Draft, verified or rejected. Only a person sets verified. Of `aai:SemanticQBR`. Value: `xsd:string`.
+  - Meaning: Draft, partially verified while findings await an escalation expert, or verified. Only a person sets verified. Of `aai:SemanticQBR`. Value: `xsd:string`.
   - In the graph: `SemanticQBR.approvalStatus`.
+- **`aai:reviewComment`** (attribute; proposed; steward: Data stewardship)
+  - Meaning: The SME's or escalation expert's comment on the finding, kept with it in memory. Of `aai:AssetObservation`, `aai:Commitment`, `aai:ExperienceObservation`, `aai:Intent`. Value: `xsd:string`.
+  - In the graph: `AssetObservation.reviewComment`; `ExperienceObservation.reviewComment`; `Intent.reviewComment`; `Commitment.reviewComment`.
