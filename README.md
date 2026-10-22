@@ -55,7 +55,7 @@ cd solution
 AAI_LIVE=1 ../.venv/bin/python -m pytest -q tests/test_llm.py   # live checks, including prompt injection
 ```
 
-Extraction uses structured outputs whose enums come from the catalog, taxonomy and roster, so the model can name only known products, intents and reps; spans that are not verbatim are rejected before review. The brief verifier rejects uncited statements, unknown ids, unproposed actions and money figures not in the evidence. On 20 October, on the earlier notes, Claude copied 13 of 13 spans verbatim, recovered all 9 hand-labelled takeaways and flagged, rather than followed, an injected instruction. These were single runs, not accuracy rates.
+Extraction uses structured outputs whose enums come from the catalog, taxonomy and roster, so the model can name only known products, intents and reps; spans that are not verbatim are rejected before review. The brief verifier rejects uncited statements, unknown ids, unproposed actions and money figures not in the evidence. On 22 October, on the Crestline notes, Claude copied 13 of 13 spans verbatim, matched 9 of 10 hand-labelled findings, gave every experience a sentiment, and flagged, rather than followed, an injected instruction; the cited brief passed the evidence check ([sample](solution/samples/brief-FIRM-001-2026-03-20.md)). The one miss is deliberate: Claude left Northfield's "their UMA" unmapped because "their" may mean a competitor's UMA, so that review stays pending for the SME. These were single runs, not accuracy rates.
 
 ## Repository
 
@@ -73,7 +73,7 @@ Extraction uses structured outputs whose enums come from the catalog, taxonomy a
 
 ## Limits
 
-Problem statements and targets are hypotheses to validate with a relationship team; none is a measured result. Action proposals are rules, not a model. The committed Claude extractions predate the Crestline catalog and the sentiment catalog: product names in them were renamed mechanically rather than re-extracted, and their experiences carry sentiment "not recorded" until `aai.llm extract` is re-run. Retention and decay are designed but not built. Domain distinctions were checked against FINRA and SEC sources on 19 October 2026; nothing here decides registration, eligibility or suitability.
+Problem statements and targets are hypotheses to validate with a relationship team; none is a measured result. Action proposals are rules, not a model. Concept detection links "their UMA" to the CPX UMA by alias, while Claude treats it as possibly a competitor's; possessive and generic mentions should be marked ambiguous for the SME. Retention and decay are designed but not built. Domain distinctions were checked against FINRA and SEC sources on 19 October 2026; nothing here decides registration, eligibility or suitability.
 
 ## Licence
 

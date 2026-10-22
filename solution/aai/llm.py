@@ -166,8 +166,10 @@ def extract_all(paths: list, out_dir: Path = EXTRACTIONS_LLM, fixture_dir: Path 
                "usage": {"input": usage.input_tokens, "output": usage.output_tokens,
                          "cache_read": usage.cache_read_input_tokens, "cache_write": usage.cache_creation_input_tokens}}
         fixture = fixture_dir / f"{iid}.yaml"
-        if fixture.exists() and (review := yaml.safe_load(fixture.read_text()).get("review")):
-            doc["review"] = review  # the historical human review is a recorded fact, not part of extraction
+        recorded = yaml.safe_load(fixture.read_text()) if fixture.exists() else {}
+        for key in ("review", "follow_up"):  # historical human decisions are recorded facts, not part of extraction
+            if recorded.get(key):
+                doc[key] = recorded[key]
         (out_dir / f"{iid}.yaml").write_text(yaml.safe_dump(doc, sort_keys=False, allow_unicode=True))
         results[iid] = (doc, body)
     return results

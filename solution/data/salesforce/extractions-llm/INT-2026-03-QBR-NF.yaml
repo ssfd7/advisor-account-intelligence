@@ -1,22 +1,22 @@
 interaction_id: INT-2026-03-QBR-NF
 extractor: claude-opus-5-5
-candidates:
-- id: LLM-INT-2026-03-QBR-NF-1
-  kind: intent
-  span: May is exploring their UMA for a new group of retirement
-    clients.
-  speaker: ADV-002
-  concept: exploring or comparing
-  target: CPX-UMA
-  desired_outcome: Use CPX Unified Managed Account for a new group of retirement clients
-  proposes_state: evaluating
-  alternatives: []
-unmapped: []
-reviewer_notes: []
+candidates: []
+unmapped:
+- May is exploring their UMA for a new group of retirement clients.
+- She also asked whether we offer separate accounts for her larger clients.
+reviewer_notes:
+- '''their UMA'' is ambiguous: ''their'' may refer to a competitor''s or third party''s
+  UMA rather than CPX Unified Managed Account (CPX-UMA). I did not map it to a product.
+  If it means CPX-UMA, this is an ''exploring or comparing'' intent by ADV-002 that
+  would propose the state ''evaluating''.'
+- '''separate accounts'' (likely separately managed accounts) matches no product in
+  the catalog. It is not clearly CPX-UMA or the Crestline Direct Index Builder (CDI).
+  I left it unmapped; it may be an inquiry about a product the platform does not offer.'
+- No commitments by REP-OMAR were recorded in the note.
 usage:
-  input: 737
-  output: 216
-  cache_read: 2910
+  input: 990
+  output: 621
+  cache_read: 3134
   cache_write: 0
 review:
   by: REP-KAI
@@ -25,4 +25,5 @@ review:
 follow_up:
   by: REP-OMAR
   at: 2026-03-12
-  approve: [intent]
+  approve:
+  - intent

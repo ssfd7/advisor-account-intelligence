@@ -3,41 +3,46 @@ extractor: claude-opus-5-5
 candidates:
 - id: LLM-INT-2026-02-EMAIL-CR-1
   kind: experience
-  span: Maya said her investors find the Crestline Model Portfolios statements difficult
-    to understand
+  span: her investors find the Crestline Model Portfolios statements difficult to
+    understand
   speaker: ADV-001
   product: CMP
   affected: investor group
+  sentiment: negative
   evidence_type: testimony
-  summary: Advisor reports her investors find CMP statements difficult to understand.
+  summary: Maya says her investors find the Crestline Model Portfolios statements
+    difficult to understand.
 - id: LLM-INT-2026-02-EMAIL-CR-2
   kind: experience
   span: her team spends hours each quarter explaining them
   speaker: ADV-001
   product: CMP
   affected: advisor team
+  sentiment: negative
   evidence_type: testimony
-  summary: Advisor reports her team spends hours each quarter explaining CMP statements
-    to investors.
+  summary: Maya's team spends hours each quarter explaining the CMP statements to
+    investors.
 - id: LLM-INT-2026-02-EMAIL-CR-3
   kind: commitment_status
   span: Forwarding my January notes to the product specialist team ahead of the session.
   speaker: REP-JORDAN
-  summary: Rep is preparing the product specialist session; dates not yet set.
+  summary: Jordan forwarded the January notes to the product specialist team ahead
+    of the session. Dates are still to follow, so the session has not yet happened.
   made_by: REP-JORDAN
   commitment: LLM-INT-2026-01-QBR-CR-5
   status: open
 unmapped:
 - Can someone from reporting join? Dates to follow.
 reviewer_notes:
-- The note forwards January QBR notes; the CMP statement experiences are likely
-  repetitions of earlier extracted takeaways.
-- Commitment LLM-INT-2026-01-QBR-CR-5 appears in progress (session being arranged,
-  'Dates to follow'), so it is recorded as open, not done.
-- The internal request for someone from reporting to join is a rep-to-team ask, not
-  a commitment to the advisor; left unmapped.
+- The note forwards a quote from the January QBR notes. The CMP statement experiences
+  likely repeat takeaways from the earlier interaction and should be checked for duplication.
+- The commitment_status link to LLM-INT-2026-01-QBR-CR-5 assumes that 'the session'
+  is the product specialist session on reporting and integration. The session is still
+  being scheduled ('Dates to follow'), so the status is set to open.
+- Jordan's request for someone from reporting to join is an internal ask, not a commitment
+  to the advisor. It is left unmapped.
 usage:
-  input: 854
-  output: 1067
-  cache_read: 2910
+  input: 1096
+  output: 1138
+  cache_read: 3134
   cache_write: 0

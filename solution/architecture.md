@@ -104,6 +104,6 @@ LadybugDB holds the graph; SQLite stands in for the task system; CSV and Markdow
 
 ## 10. Known gaps
 
-- The committed Claude extractions predate the Crestline catalog and the sentiment catalog. Product names in them were renamed mechanically, and their experiences carry sentiment "not recorded", so no service issue is proposed from them. Re-run `python -m aai.llm extract` to refresh both.
+- Concept detection links "their UMA" to the CPX UMA by alias. Claude, re-run on 22 October, left it unmapped because "their" may mean a competitor's UMA. Possessive and generic mentions should be linked as ambiguous and confirmed by the SME, not resolved silently.
 - Product-word detection is a fixed list in the catalog; unusual phrasings stay unlinked rather than wrongly linked.
 - Retention and decay are designed, not built. Taxonomy curation and clickstream are out of the first release.

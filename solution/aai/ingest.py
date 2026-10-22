@@ -193,8 +193,8 @@ def load(g: Graph, store: TaskStore, data: Path = DATA, extractions: str = "extr
             store.add_candidate(c["id"], iid, c["kind"], payload, span_id, quoted)
         add_asset_candidates(g, store, meta, bodies[iid])
         review = ext.get("review")
-        if review:  # historical SME approval and follow-up decisions recorded in the fixtures
-            decisions = {c["id"]: "confirm" for c in store.candidates(iid, "candidate")}
+        decisions = {c["id"]: "confirm" for c in store.candidates(iid, "candidate")}
+        if review and decisions:  # historical SME approval and follow-up decisions; with nothing to approve, it stays pending
             approve(g, store, store.roster, interactions, bodies, firm_names, review["by"], iid, d(str(review["at"])), decisions)
             if ext.get("follow_up"):
                 f = ext["follow_up"]

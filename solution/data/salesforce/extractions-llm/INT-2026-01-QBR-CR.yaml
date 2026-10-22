@@ -8,6 +8,7 @@ candidates:
   speaker: ADV-001
   product: CMP
   affected: investor group
+  sentiment: negative
   evidence_type: testimony
   summary: Advisor reports her investors find CMP statements difficult to understand.
 - id: LLM-INT-2026-01-QBR-CR-2
@@ -16,60 +17,65 @@ candidates:
   speaker: ADV-001
   product: CMP
   affected: advisor team
+  sentiment: negative
   evidence_type: testimony
-  summary: Advisor's team spends hours each quarter explaining CMP statements to
-    investors.
+  summary: Advisor's team spends hours each quarter explaining CMP statements to investors.
 - id: LLM-INT-2026-01-QBR-CR-3
   kind: intent
-  span: She is considering the UMA on Crestline Portfolio Exchange and asked for
-    a comparison of reporting and integration capabilities.
+  span: She is considering the UMA on Crestline Portfolio Exchange and asked for a
+    comparison of reporting and integration capabilities.
   speaker: ADV-001
+  evidence_type: testimony
   concept: exploring or comparing
   target: CPX-UMA
-  alternatives:
-  - CMP
   desired_outcome: A comparison of reporting and integration capabilities
-  reason: Investors find Crestline Model Portfolios statements difficult to understand
+  reason: Investors find CMP statements difficult to understand and the team spends
+    hours explaining them
   proposes_state: evaluating
+  alternatives: []
 - id: LLM-INT-2026-01-QBR-CR-4
   kind: experience
-  span: Custody with Crestline is working well and is not under review.
+  span: Custody with Crestline is working well and is not under review
   speaker: ADV-001
   product: CCC
   affected: advisor
+  sentiment: positive
   evidence_type: testimony
-  summary: Custody on Crestline Institutional is working well and is not under review.
+  summary: Custody with Crestline is working well and is not under review.
 - id: LLM-INT-2026-01-QBR-CR-5
   kind: commitment
   span: I promised to arrange a session with a product specialist on reporting and
     integration.
   speaker: REP-JORDAN
   product: CPX-UMA
-  summary: Arrange a session with a product specialist on reporting and integration.
+  summary: Jordan to arrange a session with a product specialist on reporting and
+    integration.
   made_by: REP-JORDAN
 unmapped: []
 reviewer_notes:
-- The custody statement is not explicitly attributed to Maya; it was assigned to ADV-001
-  as advisor testimony. Please confirm the speaker.
-- 'The ''reason'' for considering CPX-UMA is inferred from context: the CMP statement
-  difficulties. The note does not explicitly link them.'
-- Integration capabilities may relate to CPX-UMA prerequisite PRQ-001 (portfolio accounting
-  integration verified). The note does not state it as a blocker, so no blocker was
-  set.
-- The commitment's product is assigned to CPX-UMA because it supports the requested
-  comparison. It may cover both CMP and CPX-UMA. No due date was stated.
+- '''The UMA on Crestline Portfolio Exchange'' was mapped to CPX-UMA (only UMA product,
+  on PLAT-CPX); confirm.'
+- The requested comparison is likely CPX-UMA versus CMP, but the note does not state
+  the comparison baseline, so CMP was not listed as an alternative.
+- The custody statement is written in the rep's voice; attributed to the advisor as
+  testimony since it appears in her review context. Confirm whether Maya said it.
+- Interest in integration capabilities may relate to CPX-UMA prerequisite PRQ-001
+  (portfolio accounting integration verified), but no blocker was stated, so none
+  was recorded.
+- Commitment has no stated due date; the product specialist was not named (possibly
+  REP-KAI).
 usage:
-  input: 845
-  output: 1750
+  input: 1085
+  output: 1956
   cache_read: 0
-  cache_write: 2910
+  cache_write: 3134
 review:
   by: REP-DANA
   at: 2026-01-16
   decision: confirmed
-# Follow-up decided by the relationship owner: actions on intents approved, the rest dismissed with a reason.
 follow_up:
   by: REP-JORDAN
   at: 2026-01-16
-  approve: [intent]
+  approve:
+  - intent
   dismiss_reason: Raised with the statements team by email; no service ticket opened

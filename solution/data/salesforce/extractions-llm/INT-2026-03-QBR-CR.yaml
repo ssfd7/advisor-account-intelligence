@@ -6,6 +6,8 @@ candidates:
   span: Maya is postponing the CPX UMA evaluation because the integration with her
     portfolio accounting system has not been verified.
   speaker: ADV-001
+  product: CPX-UMA
+  evidence_type: testimony
   concept: postponing
   target: CPX-UMA
   reason: the integration with her portfolio accounting system has not been verified
@@ -14,33 +16,45 @@ candidates:
   alternatives: []
 - id: LLM-INT-2026-03-QBR-CR-2
   kind: experience
-  span: investors keep calling her team about the CMP quarterly statements
+  span: 'Statements are still a problem: investors keep calling her team about the
+    CMP quarterly statements.'
   speaker: ADV-001
   product: CMP
   affected: investor group
+  sentiment: negative
   evidence_type: testimony
-  summary: Ongoing problems with CMP quarterly statements; investors keep calling
-    the advisor's team about them.
+  summary: CMP quarterly statements remain a problem; investors keep calling the advisor's
+    team about them.
 - id: LLM-INT-2026-03-QBR-CR-3
+  kind: experience
+  span: Crestline custody remains in active use.
+  speaker: REP-JORDAN
+  product: CCC
+  affected: advisor
+  sentiment: neutral
+  evidence_type: testimony
+  summary: Crestline custody remains in active use.
+- id: LLM-INT-2026-03-QBR-CR-4
   kind: commitment_status
   span: The specialist session promised in January has not happened yet.
   speaker: REP-JORDAN
-  summary: The product specialist session promised in January is still outstanding.
+  summary: The January-promised specialist session on reporting and integration has
+    not yet taken place.
+  made_by: REP-JORDAN
   commitment: LLM-INT-2026-01-QBR-CR-5
   status: open
 unmapped:
-- Crestline custody remains in active use.
+- Maya said Cedar Ridge's AUM is now about $320 million across all custodians.
 reviewer_notes:
-- '''Crestline custody remains in active use.'' is a status statement, not an experience
-  or intent; a ''using'' state cannot be proposed from a conversation and needs operational
-  records.'
-- The CMP statements issue is recorded as Maya's testimony about investors;
-  the note does not quote her directly, so confirm attribution. The burden also falls
-  on her advisor team (call volume).
-- The note says 'still a problem', implying an earlier report; the system should check
-  for repetition.
+- 'CMP statements experience: the problem affects investors (confusion about statements)
+  and also creates call volume for the advisor team; affected was set to investor
+  group, but a reviewer may prefer advisor team.'
+- CMP statements and custody statements are not explicitly attributed to Maya or Jordan;
+  the statements experience was attributed to the advisor (ADV-001) and the custody-in-use
+  observation to the author (REP-JORDAN). Custody use was not used to propose a 'using'
+  state, since that requires operational records.
 usage:
-  input: 882
-  output: 1190
-  cache_read: 2910
+  input: 1157
+  output: 1493
+  cache_read: 3134
   cache_write: 0
