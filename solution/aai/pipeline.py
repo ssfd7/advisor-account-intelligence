@@ -85,7 +85,10 @@ def render(store: TaskStore, roster: Roster, meta: dict, body: str, firm_name: s
     lead = (f"Draft until an SME approves it; only approved findings enter memory." if status == "draft" else
             f"Decided by {roster.reps.get(item['resolved_by'], item['resolved_by'])} on {item['resolved_at']}: {item['status']}"
             + (f" ({item['note']})." if item["note"] else "."))
-    out += [f"{lead} Source: `{iid}`.", "", "# Product mentions", "",
+    out += [f"{lead} Source: `{iid}`.", "", "# Note", "",
+            "The note as saved. Each finding's sentence is in bold, followed by the finding's id.", "",
+            *[f"> {line}" if line else ">" for line in marked(body, cands).strip().splitlines()],
+            "", "# Product mentions", "",
             "| Phrase | In the sentence | Linked to | How |", "|---|---|---|---|"]
     for m in det["mentions"]:
         target = f"{names[m.target]} (`{m.target}`)" if m.target else "**unresolved**: ask the advisor or SME"
@@ -122,6 +125,23 @@ def render(store: TaskStore, roster: Roster, meta: dict, body: str, firm_name: s
             out.append(f"- Hint for the SME: {hints[c['id']]}")
         out.append("")
     return "\n".join(out)
+
+
+def marked(body: str, cands: list) -> str:
+    """The note with each finding's span in bold and tagged with its id; overlapping spans keep the first."""
+    spans = []
+    for c in cands:
+        if c["span_id"]:
+            start, end = map(int, c["span_id"].split("#")[1].split("-"))
+            if body[start:end].strip() and not any(start < e and s < end for s, e, _ in spans):
+                spans.append((start, end, c["id"]))
+    out, pos = [], 0
+    for start, end, cid in sorted(spans):
+        text = body[start:end]
+        lead, core, trail = text[:len(text) - len(text.lstrip())], text.strip(), text[len(text.rstrip()):]
+        out += [body[pos:start], f"{lead}**{core}** `{cid}`{trail}"]
+        pos = end
+    return "".join(out + [body[pos:]])
 
 
 def draft(store, roster, meta, body, firm_name) -> Path:

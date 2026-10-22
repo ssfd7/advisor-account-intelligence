@@ -51,6 +51,22 @@ supports:
 
 Decided by Dana Ortiz on 2026-03-20: reviewed. Source: `INT-2026-03-QBR-CR`.
 
+# Note
+
+The note as saved. Each finding's sentence is in bold, followed by the finding's id.
+
+> Quarterly review with Maya Chen, Cedar Ridge Advisory.
+>
+> **Maya is postponing the CPX UMA evaluation because the integration with her portfolio accounting system has not been verified.** `CAND-03-1`
+>
+> Statements are still a problem: **investors keep calling her team about the CMP quarterly statements** `CAND-03-2`.
+>
+> Crestline custody remains in active use.
+>
+> **The specialist session promised in January has not happened yet.** `CAND-03-3`
+>
+> **Maya said Cedar Ridge's AUM is now about $320 million across all custodians.** `DET-INT-2026-03-QBR-CR-A1`
+
 # Product mentions
 
 | Phrase | In the sentence | Linked to | How |
@@ -99,4 +115,4 @@ Decided by Dana Ortiz on 2026-03-20: reviewed. Source: `INT-2026-03-QBR-CR`.
 
 - Reads as: reported AUM 320,000,000 USD, across all custodians
 - Writes: aai:AssetObservation, aai:measures, aai:reportedBy, aai:supportedBy, aai:evidenceType
-- Decision: rejected by Dana Ortiz: figure is approximate; ask for the ADV
+- Decision: approved by Dana Ortiz on 2026-03-20
