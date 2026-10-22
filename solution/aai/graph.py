@@ -92,8 +92,10 @@ RELS = [
 class Graph:
     def __init__(self, path: Path, fresh: bool = False):
         path = Path(path)
-        if fresh and path.exists():
-            shutil.rmtree(path) if path.is_dir() else path.unlink()
+        if fresh:
+            for old in (path, path.with_name(path.name + ".wal")):
+                if old.exists():
+                    shutil.rmtree(old) if old.is_dir() else old.unlink()
         path.parent.mkdir(parents=True, exist_ok=True)
         new = not path.exists()
         self.db = lb.Database(str(path))

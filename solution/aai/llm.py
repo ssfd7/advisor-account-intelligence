@@ -96,8 +96,8 @@ def context_block(meta, catalog, taxonomy, roster, advisors, firms, prior_commit
     ctx = {
         "interaction": {k: str(meta[k]) for k in ("interaction_id", "type", "date", "author", "firm", "advisor")},
         "advisor": advisors.get(meta["advisor"]), "firm": firms.get(meta["firm"]),
-        "products": [{"id": o["id"], "name": o["name"], "platform": o["platform"], "category": o["category"],
-                      "prerequisites": o.get("prerequisites", [])} for o in catalog["offerings"]],
+        "products": [{"id": o["id"], "name": o["name"], "aliases": o.get("aliases", []), "platform": o["platform"],
+                      "category": o["category"], "prerequisites": o.get("prerequisites", [])} for o in catalog["offerings"]],
         "intent_taxonomy": [c["label"] for c in taxonomy["concepts"]],
         "reps": roster["reps"],
         "earlier_commitments": prior_commitments,
@@ -137,6 +137,27 @@ def extract_one(cl, Extraction, meta, body, context: str):
     if response.stop_reason == "max_tokens":
         raise RuntimeError(f"{meta['interaction_id']}: output truncated")
     return response.parsed_output, response.usage
+
+
+def extract_note(path: Path, prior_commitments: list) -> dict:
+    """One note, live: the same schema, context and output format as `extract_all`, without writing files."""
+    import csv
+    catalog, taxonomy, roster = _reference()
+    advisors = {r["advisor_id"]: r["full_name"] for r in csv.DictReader(open(DATA / "snowflake" / "advisors.csv"))}
+    firms = {r["firm_id"]: r["legal_name"] for r in csv.DictReader(open(DATA / "snowflake" / "firms.csv"))}
+    meta, body = parse_interaction(path)
+    parsed, usage = extract_one(client(), schema(), meta, body,
+                                context_block(meta, catalog, taxonomy, roster, advisors, firms, prior_commitments))
+    cands = []
+    for n, c in enumerate(parsed.candidates, 1):
+        d = {k: v for k, v in c.model_dump().items() if v not in (None, [])}
+        if c.kind == "intent":
+            d.setdefault("alternatives", [])
+        cands.append({"id": f"LLM-{meta['interaction_id']}-{n}", **d})
+    return {"interaction_id": meta["interaction_id"], "extractor": MODEL, "candidates": cands,
+            "unmapped": parsed.unmapped, "reviewer_notes": parsed.reviewer_notes,
+            "usage": {"input": usage.input_tokens, "output": usage.output_tokens,
+                      "cache_read": usage.cache_read_input_tokens, "cache_write": usage.cache_creation_input_tokens}}
 
 
 def extract_all(paths: list, out_dir: Path = EXTRACTIONS_LLM, fixture_dir: Path = DATA / "salesforce" / "extractions"):

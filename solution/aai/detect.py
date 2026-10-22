@@ -26,7 +26,7 @@ class Mention:
     sentence: tuple          # (start, end) offsets of the sentence that contains the mention
     target: str | None       # offering or platform id; None when unresolved
     target_kind: str | None  # "offering" or "platform"
-    method: str              # "name", "alias" or "unresolved"
+    method: str              # "name", "alias", "ambiguous" (an alias after "their": ours or a competitor's?) or "unresolved"
 
 
 @dataclass
@@ -86,6 +86,8 @@ def link_products(text: str, catalog: dict) -> list:
             if any(m.start() < e and s < m.end() for s, e in taken):
                 continue
             taken.append((m.start(), m.end()))
+            if method == "alias" and re.search(r"\btheir\s+$", text[max(0, m.start() - 8):m.start()], re.I):
+                method = "ambiguous"  # "their UMA" may be a competitor's; the SME decides
             mentions.append(Mention(m.group(0), m.start(), m.end(), _sentence_of(spans, m.start()), target, kind, method))
     for term in sorted(catalog.get("product_terms", []), key=len, reverse=True):
         for m in _find(text, term):

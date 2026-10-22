@@ -147,6 +147,31 @@ def commitments(g: Graph, roster: Roster, user: str, firm: str, known_at: date) 
     return rows
 
 
+# ------------------------------------------------------------ search: who is talking about a product
+
+def who_mentions(g: Graph, roster: Roster, user: str, text: str, at: date, catalog: dict) -> dict:
+    """Advisors whose approved intent or experience concerns the products the search text names. The search text is
+    linked with the same catalog entity linker as the notes, so a name, an alias or a loose phrase finds the same
+    product. Only firms in the user's scope are searched."""
+    from .detect import link_products
+    products = sorted({m.target for m in link_products(text, catalog) if m.target_kind == "offering"})
+    rows = []
+    for firm in sorted(p for p in roster.scope(user) if p.startswith("FIRM-")):
+        name = g.one("MATCH (f:Firm {id: $f}) RETURN f.name AS n", f=firm)["n"]
+        advisor = g.one("MATCH (i:Interaction)-[:withParty]->(:Firm {id: $f}), (i)-[:withParty]->(a:Advisor) RETURN a.name AS n LIMIT 1", f=firm)
+        for i in intents(g, roster, user, firm, at, at):
+            if i["targetId"] in products:
+                state = product_state(g, roster, user, firm, i["targetId"], at, at)
+                rows.append({"advisor": advisor["n"] if advisor else "", "firm": name, "product": i["target"], "intent": i["intent"],
+                             "reason": i["reason"], "since": i["date"], "state": state["state"],
+                             "discrepancy": "; ".join(state["discrepancies"])})
+        for e in experience(g, roster, user, firm, at, at):
+            if any(e["product"] == g.one("MATCH (o:ProductOffering {id: $p}) RETURN o.name AS n", p=p)["n"] for p in products):
+                rows.append({"advisor": e["reportedBy"] or "", "firm": name, "product": e["product"], "intent": "experience",
+                             "reason": f"{e['sentiment']}: {e['summary']}", "since": e["date"], "state": "", "discrepancy": ""})
+    return {"products": products, "rows": rows}
+
+
 # ------------------------------------------------------------ CQ5: proposed actions (rule-based stand-in for the assistant)
 
 def propose_actions(g: Graph, roster: Roster, user: str, firm: str, interaction: str, at: date) -> list:

@@ -44,6 +44,15 @@ cd solution
 
 Each run rebuilds `solution/.data/`, including the semantic QBRs in `.data/semantic-qbr/`. An approved one is committed as [a sample](solution/samples/semantic-qbr-INT-2026-03-QBR-CR.md).
 
+### Present the accelerator (screen 1)
+
+```bash
+cd solution
+../.venv/bin/streamlit run app.py       # opens in the browser; add ?replay=1 to skip the live call, ?beat=N to jump
+```
+
+The same QBR note, before and after, in four beats the presenter advances: **Today** (the note as the CRM holds it; a CRM search for "CPX Unified Managed Account" finds nothing), **Understand this note** (Claude reads it live against the firm's catalog, intents and sentiments in about 17 seconds; products, intent, sentiment, the open promise and the $320M figure light up, and hovering explains each), **SME approves** (the side panel shows what the firm now knows, what not to say, what is owed and who owns it), and **Ask the firm** (the same search now finds both advisors from approved memory). If the live call fails, it replays the last live reading.
+
 ### With Claude
 
 Copy `.env.example` to `.env` at the project root (git-ignored) and set `ANTHROPIC_API_KEY`, or export it, or use an `ant auth login` profile. Each run costs a few cents.

@@ -17,3 +17,6 @@ work/
 
 # Local secrets
 .env
+
+# Screen 1: this session's live reading of the March note
+solution/data/salesforce/extractions-live/

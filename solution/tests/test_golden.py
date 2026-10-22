@@ -64,7 +64,7 @@ def test_loose_and_specific_product_mentions_link_to_the_catalog(world):
     links = {m.phrase: m.target for m in detect(world["first"]["bodies"][MAR])["mentions"]}
     assert links == {"CPX UMA": "CPX-UMA", "CMP": "CMP", "Crestline custody": "CCC"}
     nf = {m.phrase: (m.target, m.method) for m in detect(world["first"]["bodies"][NF])["mentions"]}
-    assert nf["UMA"] == ("CPX-UMA", "alias") and nf["separate accounts"] == (None, "unresolved")
+    assert nf["UMA"] == ("CPX-UMA", "ambiguous") and nf["separate accounts"] == (None, "unresolved")
 
 
 def test_asset_figure_is_read_with_metric_and_scope(world):

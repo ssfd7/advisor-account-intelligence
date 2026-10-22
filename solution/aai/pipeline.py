@@ -106,7 +106,8 @@ def render(store: TaskStore, roster: Roster, meta: dict, body: str, firm_name: s
             "", "# Product mentions", "",
             "| Phrase | In the sentence | Linked to | How |", "|---|---|---|---|"]
     for m in det["mentions"]:
-        target = f"{names[m.target]} (`{m.target}`)" if m.target else "**unresolved**: ask the advisor or SME"
+        target = (f"{names[m.target]} (`{m.target}`)?: ours or a competitor's, for the SME" if m.method == "ambiguous" else
+                  f"{names[m.target]} (`{m.target}`)" if m.target else "**unresolved**: ask the advisor or SME")
         out.append(f"| {m.phrase} | {_span(body, *m.sentence)} | {target} | {m.method} |")
     out += ["", "# Asset figures", ""]
     if not det["assets"]:
@@ -225,7 +226,7 @@ def hydrate(g: Graph, store: TaskStore, roster: Roster, meta: dict, body: str, a
         g.link("SourceSpan", span_id, "partOf", "Interaction", iid)
         g.link("SemanticQBR", sq, "contains", "ProductMention", mid)
         g.link("ProductMention", mid, "foundIn", "SourceSpan", span_id)
-        if m.target_kind == "offering":
+        if m.target_kind == "offering" and m.method != "ambiguous":  # an ambiguous link is not a fact
             g.link("ProductMention", mid, "refersTo", "ProductOffering", m.target)
     if not start_run:
         return None

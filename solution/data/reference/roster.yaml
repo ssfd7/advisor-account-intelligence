@@ -6,7 +6,7 @@ teams:
     lead: REP-LEE
     owner: REP-JORDAN
     sme: REP-DANA
-    members: [REP-JORDAN, REP-PRIYA, REP-LEE, REP-DANA, REP-RIA]
+    members: [REP-JORDAN, REP-PRIYA, REP-LEE, REP-DANA, REP-RIA, REP-HEAD]
     relationships: [FIRM-001, ADV-001]
     review_days: 5
   - id: TEAM-NF
@@ -14,7 +14,7 @@ teams:
     lead: REP-SAM
     owner: REP-OMAR
     sme: REP-KAI
-    members: [REP-OMAR, REP-SAM, REP-KAI, REP-RIA]
+    members: [REP-OMAR, REP-SAM, REP-KAI, REP-RIA, REP-HEAD]
     relationships: [FIRM-002, ADV-002]
     review_days: 5
 reps:
@@ -26,3 +26,4 @@ reps:
   - {id: REP-SAM, name: Sam, role: team lead}
   - {id: REP-KAI, name: Kai Moreno, role: product specialist, sme: true}
   - {id: REP-RIA, name: Ria Patel, role: data steward, sme: true}
+  - {id: REP-HEAD, name: Morgan Hale, role: head of relationship management}
