@@ -10,9 +10,9 @@ Technical design: [architecture](../solution/architecture.md)
 
 <p align="center"><sub><i>Solution vision</i></sub><br><b>Agentic teams that listen to understand, learn and retain what matters, discover what's possible, and turn understanding into opportunities.</b></p>
 
-<p align="center"><sub><i>Agentic teams: subject-matter-expert teams with AI agents embedded across the whole advisor lifecycle, and a human in the middle of every decision.</i></sub></p>
+---
 
-This release builds the foundation, knowing each advisor deeply. Next best action, then discovering the most promising advisors, follow on the roadmap (section 9).
+*Agentic teams* are subject-matter-expert teams with AI agents embedded across the whole advisor lifecycle, and a human in the middle of every decision. This release builds the foundation, knowing each advisor deeply. Next best action, then discovering the most promising advisors, follow on the roadmap (section 9).
 
 Salesforce holds a QBR as text. It does not know the firm's products, services or advisor intents, so what the advisor said is invisible to every system and to every colleague who did not write it. The product turns each QBR into knowledge the firm can act on.
 
