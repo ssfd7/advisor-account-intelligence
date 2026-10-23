@@ -77,6 +77,13 @@ header[data-testid='stHeader'] {display: none}
 .p-asset {background: #7f56d9; color: #fff} .p-chip {background: #e3f3e8; color: #1e6b37; font-weight: 500}
 .p-ambiguous {background: #fde9c9; color: #8c4b02; font-weight: 500}
 .ok {color: #2e844a; font-weight: 600}
+[data-tip] {position: relative}
+[data-tip]:hover {z-index: 30}
+.pill {position: relative; z-index: 1}
+[data-tip]:hover:not(:has([data-tip]:hover))::after {content: attr(data-tip); position: absolute; left: 0; top: calc(100% + 6px);
+    z-index: 20; width: max-content; max-width: 380px; white-space: normal; background: #2e2e38; color: #fff; font-size: 13px;
+    font-weight: 400; line-height: 1.45; padding: 8px 11px; border-radius: 6px; box-shadow: 0 4px 14px rgba(0,0,0,.18);
+    text-transform: none; letter-spacing: 0; border-left: 3px solid #ffe600; pointer-events: none}
 @keyframes reveal {from {opacity: 0; transform: translateY(3px)} to {opacity: 1; transform: none}}
 .search {border: 1px solid #d8dde6; border-radius: 6px; padding: 10px 14px; background: #fff; margin-bottom: 12px; font-size: 14px}
 .search .q {font-weight: 600; color: #16325c} .zero {color: #ba0517; font-weight: 600}
@@ -135,7 +142,7 @@ def tooltip_for(c, nm):
     if k == "intent":
         return f"Intent: {c.get('concept')} → {nm.get(c.get('target'), c.get('target'))}. Reason: {c.get('reason')}. Proposes: {c.get('proposes_state') or 'no state change'}."
     if k == "experience":
-        return f"Experience ({c.get('sentiment') or 'sentiment not recorded'}) with {nm.get(c.get('product'), c.get('product'))}, affecting the {c.get('affected')}. {c.get('summary')}. Testimony, not a measured outcome."
+        return f"Experience ({c.get('sentiment') or 'sentiment not recorded'}) with {nm.get(c.get('product'), c.get('product'))}, affecting the {c.get('affected')}. {(c.get('summary') or '').rstrip('.')}. Testimony, not a measured outcome."
     if k == "commitment_status":
         return f"Update on an earlier promise ({c.get('commitment')}): still {c.get('status')}."
     if k == "commitment":
@@ -181,17 +188,17 @@ def annotate(body, findings, mentions, nm, statuses):
                 tip = f"Linked to the Crestline catalog: {nm[m.target]} ({m.target}), by {m.method}."
             else:
                 tip = "A kind of product with no match in the catalog: left unresolved for the SME."
-            text = f'<span class="m m-{m.method}" title="{esc(tip)}">{text}</span>'
+            text = f'<span class="m m-{m.method}" data-tip="{esc(tip)}">{text}</span>'
         if f:
             cls = pill_for(f, nm)[0]
-            text = f'<span class="f f-{cls}" title="{esc(tooltip_for(f, nm))}">{text}</span>'
+            text = f'<span class="f f-{cls}" data-tip="{esc(tooltip_for(f, nm))}">{text}</span>'
         elif not m:
             text = f'<span class="plain">{text}</span>'
         out.append(text)
         for s, e, c in spans:
             if e == b:
                 cls, label = pill_for(c, nm, statuses.get(c["id"]))
-                out.append(f'<span class="pill p-{cls}" title="{esc(tooltip_for(c, nm))}">{esc(label)}</span>')
+                out.append(f'<span class="pill p-{cls}" data-tip="{esc(tooltip_for(c, nm))}">{esc(label)}</span>')
         for mm in mentions:
             if mm.end == b and mm.target and mm.method == "ambiguous":
                 out.append(f'<span class="pill p-ambiguous">ours or a competitor\'s?</span>')

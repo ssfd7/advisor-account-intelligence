@@ -46,6 +46,10 @@ Each run rebuilds `solution/.data/`, including the semantic QBRs in `.data/seman
 
 ### Present the accelerator (screen 1)
 
+![The accelerator: the same QBR note, before and after](solution/media/accelerator-walkthrough.gif)
+
+Full walkthrough, 44 seconds: [accelerator-walkthrough.mp4](solution/media/accelerator-walkthrough.mp4) (recorded in replay mode; live, step 2 takes about 17 seconds).
+
 ```bash
 cd solution
 ../.venv/bin/streamlit run app.py       # opens in the browser; add ?replay=1 to skip the live call, ?beat=N to jump
