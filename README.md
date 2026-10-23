@@ -6,6 +6,10 @@ Salesforce holds a QBR as text. It does not know the firm's products, services o
 
 **Status (21 October 2026):** a runnable demo plays the six takeaways below over a LadybugDB graph and a mock task store; 31 golden tests pass. Claude (`claude-opus-5-5`) can extract findings and write a cited brief that is checked before anyone sees it.
 
+![The accelerator: the same QBR note, before and after](solution/media/accelerator-walkthrough.gif)
+
+*The same QBR note, before and after: products linked to the catalog, intent and sentiment read, expert approval, the firm's answer, and the business case.* Full 44-second walkthrough: [accelerator-walkthrough.mp4](solution/media/accelerator-walkthrough.mp4) (recorded in replay mode; live, the reading takes about 17 seconds).
+
 ## What the business should take away
 
 1. **The firm finally knows what its advisors tell it.** Products, services, intents and asset figures in a QBR are recognized against the firm's own catalog, including loose mentions like "their UMA".
@@ -46,9 +50,7 @@ Each run rebuilds `solution/.data/`, including the semantic QBRs in `.data/seman
 
 ### Present the accelerator (screen 1)
 
-![The accelerator: the same QBR note, before and after](solution/media/accelerator-walkthrough.gif)
-
-Full walkthrough, 44 seconds: [accelerator-walkthrough.mp4](solution/media/accelerator-walkthrough.mp4) (recorded in replay mode; live, step 2 takes about 17 seconds).
+The recording at the top of this page shows these steps.
 
 ```bash
 cd solution
