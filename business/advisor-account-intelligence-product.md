@@ -10,7 +10,7 @@ Technical design: [architecture](../solution/architecture.md)
 
 <p align="center"><sub><i>Solution vision</i></sub><br><b>Agentic teams<sup>*</sup> that listen to understand, learn and retain what matters, discover what's possible, and turn understanding into opportunities.</b></p>
 
-<p align="center">* <i>Agentic teams</i> are subject-matter-expert teams with AI agents embedded across the whole advisor lifecycle, and a human in the middle of every decision.</p>
+<p align="center"><sub>* <i>Agentic teams</i> are subject-matter-expert teams with AI agents embedded across the whole advisor lifecycle, and a human in the middle of every decision.</sub></p>
 
 ---
 
