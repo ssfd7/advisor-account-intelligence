@@ -6,11 +6,11 @@ Technical design: [architecture](../solution/architecture.md)
 
 ## 1. Vision
 
-**Business vision:** Discover the best and most promising advisors, know them deeply, and recommend next best moves for advisors and firm to thrive.
+<p align="center"><sub><i>Business vision</i></sub><br><b>Discover the best and most promising advisors, know them deeply, and recommend next best moves for advisors and firm to thrive.</b></p>
 
-**Solution vision:** Agentic teams that listen to understand, learn and retain what matters, discover what's possible, and turn understanding into opportunities.
+<p align="center"><sub><i>Solution vision</i></sub><br><b>Agentic teams that listen to understand, learn and retain what matters, discover what's possible, and turn understanding into opportunities.</b></p>
 
-*Agentic teams: subject-matter-expert teams with AI agents embedded across the whole advisor lifecycle, and a human in the middle of every decision.*
+<p align="center"><sub><i>Agentic teams: subject-matter-expert teams with AI agents embedded across the whole advisor lifecycle, and a human in the middle of every decision.</i></sub></p>
 
 This release builds the foundation, knowing each advisor deeply. Next best action, then discovering the most promising advisors, follow on the roadmap (section 9).
 
