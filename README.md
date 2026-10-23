@@ -4,9 +4,9 @@
 
 <p align="center"><sub><i>Solution vision</i></sub><br><b>Agentic teams<sup>*</sup> that listen to understand, learn and retain what matters, discover what's possible, and turn understanding into opportunities.</b></p>
 
----
+<p align="center">* <i>Agentic teams</i> are subject-matter-expert teams with AI agents embedded across the whole advisor lifecycle, and a human in the middle of every decision.</p>
 
-\* *Agentic teams* are subject-matter-expert teams with AI agents embedded across the whole advisor lifecycle, and a human in the middle of every decision.
+---
 
 Salesforce holds a QBR as text. It does not know the firm's products, services or advisor intents, so what the advisor said is invisible to every system and to every colleague who did not write it. This accelerator builds the foundation of the vision, knowing each advisor deeply: it links what the advisor said to the firm's own catalog, has an expert approve it, writes it to a governed memory, and gives every follow-up an owner. Next best moves, and discovering the most promising advisors, build on that foundation (see [Roadmap](#roadmap)). All data is synthetic; Crestline and its products are fictional.
 
