@@ -6,7 +6,13 @@
 
 ## Vision
 
-**If our relationship teams knew what the firm knows, they would be far more productive.** The pilot's target is three times; the pilot measures it.
+**Business vision:** Discover the best and most promising advisors, know them deeply, and recommend next best moves for advisors and firm to thrive.
+
+**Solution vision:** Agentic teams that listen to understand, learn and retain what matters, discover what's possible, and turn understanding into opportunities.
+
+*Agentic teams: subject-matter-expert teams with AI agents embedded across the whole advisor lifecycle, and a human in the middle of every decision.*
+
+Updated 23 October 2026; how it got here is in [vision-dev.md](vision-dev.md). The 3× preparation target remains a pilot measure. Next best action is on the roadmap, not in the first release.
 
 Salesforce holds a QBR as text. It does not know the firm's products, services or advisor intents, so what the advisor said is invisible to every system and to every colleague who did not write it. The product turns each QBR into knowledge the firm can act on.
 

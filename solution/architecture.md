@@ -2,7 +2,18 @@
 
 Version 0.3 · 22 October 2026 · Companion to [the product brief](../business/advisor-account-intelligence-product.md)
 
-The product turns each QBR note into knowledge the firm can act on. This document describes how: the pipeline, the five memory types it reads and writes, the one gate between them, and the OKF bundle that holds the procedure. Code paths are under `solution/`.
+**Solution vision:** Agentic teams that listen to understand, learn and retain what matters, discover what's possible, and turn understanding into opportunities.
+
+*Agentic teams: subject-matter-expert teams with AI agents embedded across the whole advisor lifecycle, and a human in the middle of every decision.*
+
+| The vision says | Here |
+|---|---|
+| Listen to understand | Concept detection and candidate findings: every note read against the firm's catalog, intents and sentiments (§1) |
+| Learn and retain what matters | The SME gate and the five memory types: only approved findings are remembered, with source, time and scope (§2, §3) |
+| Discover what's possible | Search across approved memory with the catalog linker; associative traversal from a finding to products, prerequisites and commitments (§2) |
+| Turn understanding into opportunities | Procedure runs: owned, dated follow-up, today; next best action on the roadmap (§9) |
+
+This document describes the pipeline, the five memory types it reads and writes, the one gate between them, and the OKF bundle that holds the procedure. Code paths are under `solution/`.
 
 ## 1. Pipeline
 
@@ -101,7 +112,7 @@ Memory metrics for the pilot: required-evidence recall, as-of correctness, super
 
 ## 9. Technology and later work
 
-LadybugDB holds the graph; SQLite stands in for the task system; CSV and Markdown stand in for Snowflake and Salesforce exports. Claude (`claude-opus-5-5`) is used through structured outputs with a cached system prompt. Later work, each kept only if measured to help: retention and decay; specialist agents sharing the same evidence contract as human handoffs; serving at team scale (latency, concurrency, cost per accepted brief).
+LadybugDB holds the graph; SQLite stands in for the task system; CSV and Markdown stand in for Snowflake and Salesforce exports. Claude (`claude-opus-5-5`) is used through structured outputs with a cached system prompt. Later work, each kept only if measured to help: next best action for advisors and the firm, including career moves, built on approved signals with an expert approving each recommendation; then discovering the most promising advisors across the firm; retention and decay; specialist agents sharing the same evidence contract as human handoffs; serving at team scale (latency, concurrency, cost per accepted brief).
 
 ## 10. Known gaps
 

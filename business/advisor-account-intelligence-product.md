@@ -6,7 +6,13 @@ Technical design: [architecture](../solution/architecture.md)
 
 ## 1. Vision
 
-**If our relationship teams knew what the firm knows, they would be far more productive.** The pilot's target is three times; the pilot measures it.
+**Business vision:** Discover the best and most promising advisors, know them deeply, and recommend next best moves for advisors and firm to thrive.
+
+**Solution vision:** Agentic teams that listen to understand, learn and retain what matters, discover what's possible, and turn understanding into opportunities.
+
+*Agentic teams: subject-matter-expert teams with AI agents embedded across the whole advisor lifecycle, and a human in the middle of every decision.*
+
+This release builds the foundation, knowing each advisor deeply. Next best action, then discovering the most promising advisors, follow on the roadmap (section 9).
 
 Salesforce holds a QBR as text. It does not know the firm's products, services or advisor intents, so what the advisor said is invisible to every system and to every colleague who did not write it. The product turns each QBR into knowledge the firm can act on.
 
@@ -70,13 +76,19 @@ The first release covers one advisor across review cycles. Pooled knowledge acro
 
 | Measure | Baseline to collect | Pilot target |
 |---|---|---|
-| Preparation time | Human minutes per brief, including lookup and correction | Toward the vision's 3×; at least 30% lower median effort net of SME review |
+| Preparation time | Human minutes per brief, including lookup and correction | Toward 3× faster preparation; at least 30% lower median effort net of SME review |
 | Lost follow-ups | Takeaways never followed up, and how many coincided with absence | Every seeded absence reaches an owner and verified closure |
 | Errors caught | Pitches of postponed products, unsupported totals, overstated credentials, missed discrepancies | No critical misattribution in the acceptance suite; count what was caught |
 | SME review load | Findings per QBR, review minutes, overdue reviews | Agree a ceiling after the first month |
 
 Baseline: about 20 comparable preparation tasks with relationship-manager review, counterbalanced between manual and assisted, plus a sample of recent notes checked for lost follow-ups. Capacity freed is not cash saved; retained revenue and AUM growth are excluded until attribution is supported.
 
-## 9. Open decisions and limits
+## 9. Roadmap
+
+1. **Now: know them deeply.** This release, sections 2 to 8.
+2. **Next: next best action.** Just-in-time recommendations for the advisor and the firm, including career moves, product and service steps. Signals: approved intent and sentiment, open commitments, affiliation changes, exam milestones, asset observations. An expert approves each recommendation before it is shared; acceptance and outcomes are measured against a baseline.
+3. **Then: discover the best and most promising advisors.** Knowledge pooled across advisors under the same access scopes, career-pattern signals with bias checks, and retention and revenue effects only once they can be attributed. CLTV and predictive scoring stay out until then.
+
+## 10. Open decisions and limits
 
 Confirm the business unit and SME role, the catalog sources and alias owners, which communications need compliance review, and retention requirements for notes and semantic QBRs. All data is synthetic, and the problem statements and targets are hypotheses to validate. Domain distinctions were checked against FINRA and SEC sources on 19 October 2026; registration rules still need jurisdiction-specific review.

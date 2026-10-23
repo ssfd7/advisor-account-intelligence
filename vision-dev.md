@@ -68,7 +68,19 @@ The new vision promises just-in-time recommendations, including career moves, an
 
 So the first release delivers the foundation: knowing each advisor in time, from expert-approved conversations, with every promise owned. **Next best action**, including career recommendations, builds on that foundation in a later phase, and the documents should say so.
 
-## Still to do
+## Step 6: two visions
+
+The working vision still tried to say two things at once: what the business wants, and how the solution gets there. It was split:
+
+> **Business vision:** Discover the best and most promising advisors, know them deeply, and recommend next best moves for advisors and firm to thrive.
+>
+> **Solution vision:** Agentic teams that listen to understand, learn and retain what matters, discover what's possible, and turn understanding into opportunities.
+
+The business vision covers the whole arc: discover (the most promising advisors), know (them deeply), recommend (next best moves) and thrive (advisors and firm together). The solution vision describes what the agentic teams do, in four verbs that map onto the pipeline: listen to understand (detection and extraction), learn and retain (the SME gate and memory), discover (search and traversal over approved memory) and turn understanding into opportunities (owned follow-up today, next best action next). "No conversation goes to waste" remains the line for presenting.
+
+Applied on 23 October 2026 to the README, the product brief, `pivot.md` and the architecture doc, with the agentic-teams definition and a roadmap: now, know them deeply; next, next best action; then, discover the most promising advisors.
+
+## Earlier to-do list (done)
 
 - Confirm the headline: "what each advisor needs next" is the working choice.
 - Apply the vision, the supporting line and the definition to the README, the product brief, `pivot.md` and the architecture doc.

@@ -1,10 +1,14 @@
 # Advisor Account Intelligence
 
-**If our relationship teams knew what the firm knows, they would be far more productive.**
+**Business vision:** Discover the best and most promising advisors, know them deeply, and recommend next best moves for advisors and firm to thrive.
 
-Salesforce holds a QBR as text. It does not know the firm's products, services or advisor intents, so what the advisor said is invisible to every system and to every colleague who did not write it. This project turns each QBR into knowledge the firm can act on: it links what the advisor said to the firm's own catalog, has an expert approve it, writes it to a governed memory, and gives every follow-up an owner. All data is synthetic; Crestline and its products are fictional.
+**Solution vision:** Agentic teams that listen to understand, learn and retain what matters, discover what's possible, and turn understanding into opportunities.
 
-**Status (21 October 2026):** a runnable demo plays the six takeaways below over a LadybugDB graph and a mock task store; 31 golden tests pass. Claude (`claude-opus-5-5`) can extract findings and write a cited brief that is checked before anyone sees it.
+*Agentic teams: subject-matter-expert teams with AI agents embedded across the whole advisor lifecycle, and a human in the middle of every decision.*
+
+Salesforce holds a QBR as text. It does not know the firm's products, services or advisor intents, so what the advisor said is invisible to every system and to every colleague who did not write it. This accelerator builds the foundation of the vision, knowing each advisor deeply: it links what the advisor said to the firm's own catalog, has an expert approve it, writes it to a governed memory, and gives every follow-up an owner. Next best moves, and discovering the most promising advisors, build on that foundation (see [Roadmap](#roadmap)). All data is synthetic; Crestline and its products are fictional.
+
+**Status (23 October 2026):** a five-step accelerator screen for presenting to a client, and a terminal demo of the six takeaways, run the same pipeline over a LadybugDB graph and a mock task store; 41 tests pass. Claude (`claude-opus-5-5`) reads notes live, and writes a cited brief that is checked before anyone sees it.
 
 ![The accelerator: the same QBR note, before and after](solution/media/accelerator-walkthrough.gif)
 
@@ -84,7 +88,7 @@ Extraction uses structured outputs whose enums come from the catalog, taxonomy a
 
 | Path | Contents |
 |---|---|
-| [`business/advisor-account-intelligence-product.md`](business/advisor-account-intelligence-product.md) | Product brief: vision, takeaways, problem, the Maya scenario, scope by memory type, success measures |
+| [`business/advisor-account-intelligence-product.md`](business/advisor-account-intelligence-product.md) | Product brief: business and solution vision, takeaways, problem, the Maya scenario, scope by memory type, success measures, roadmap |
 | [`solution/architecture.md`](solution/architecture.md) | Pipeline, five memory types, the gate, authority and continuity, the OKF bundle, evaluation, known gaps |
 | [`solution/model/`](solution/model/README.md) | Knowledge graph model: Draw.io (overview and four pages) and Turtle |
 | `solution/bundle/` | OKF bundle: the QBR procedure, its computations and tools, generated glossaries and graph mapping |
@@ -93,6 +97,16 @@ Extraction uses structured outputs whose enums come from the catalog, taxonomy a
 | `solution/tests/` | Golden and LLM tests |
 | `solution/tools/` | Model generator and checker, diagram renderer |
 | [`AGENTS.md`](AGENTS.md) | Modelling and Draw.io conventions |
+
+## Roadmap
+
+| Stage | Business vision | What it delivers |
+|---|---|---|
+| **Now: know them deeply** | Know each advisor deeply | This release: every QBR read against the firm's catalog, approved by an expert, remembered with its source and date, and followed up by an owner, even when the rep is away |
+| **Next: next best action** | Recommend next best moves for advisors and the firm | Just-in-time recommendations, including career moves, product and service steps, built from approved signals: intent and sentiment, open commitments, affiliation changes, exam milestones and asset observations. An expert approves each recommendation before it reaches the advisor; measured by acceptance and outcomes |
+| **Then: discover** | Discover the best and most promising advisors | Knowledge pooled across advisors under the same access scopes; career-pattern signals with bias checks; revenue and retention effects only once the pilot can attribute them |
+
+Also planned: retention and decay of memory, specialist agents sharing the same evidence contract as human handoffs, and serving at team scale.
 
 ## Limits
 
