@@ -1,8 +1,6 @@
-# Advisor Account Intelligence
+<h1 align="center">Advisor Account Intelligence</h1>
 
-Business product brief · Version 0.7 · 21 October 2026 · Working assumptions for validation
-
-Technical design: [architecture](../solution/architecture.md)
+<p align="center">Business product brief · Version 0.8 · 23 October 2026 · Working assumptions for validation<br>Technical design: <a href="../solution/architecture.md">architecture</a></p>
 
 ## 1. Vision
 

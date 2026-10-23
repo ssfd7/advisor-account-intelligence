@@ -1,4 +1,4 @@
-# Advisor Account Intelligence
+<h1 align="center">Advisor Account Intelligence</h1>
 
 <p align="center"><sub><i>Business vision</i></sub><br><b>Discover the best and most promising advisors, know them deeply, and recommend next best moves for advisors and firm to thrive.</b></p>
 
