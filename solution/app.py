@@ -35,14 +35,25 @@ REPLAY = APP / "last-live.yaml"
 VIEWER = "REP-HEAD"
 D19, D20, D21 = date(2026, 3, 19), date(2026, 3, 20), date(2026, 3, 21)
 PRIOR = [{"id": "CAND-01-4", "summary": "Specialist session on reporting and integration", "due": "2026-02-28"}]
-BEATS = ["Today", "Understand this note", "SME approves", "Ask the firm"]
+BEATS = ["Today", "Understand this note", "SME approves", "Ask the firm", "The business case"]
 
 CSS = """
 <style>
 .block-container {padding-top: 2.2rem; max-width: 1400px}
 header[data-testid='stHeader'] {display: none}
-.stButton button[kind='primary'] {background: #2e2e38; border-color: #2e2e38; color: #ffe600; font-weight: 600}
-.beats {font-size: 15px; color: #8a94a6; padding-top: 8px} .beats b {color: #16325c; border-bottom: 3px solid #ffe600}
+[class*="st-key-step"] button {height: 46px; width: 100%; border: none; border-radius: 0; font-size: 14px; font-weight: 600;
+    background: #e8ecf1; color: #16325c; clip-path: polygon(0 0, calc(100% - 16px) 0, 100% 50%, calc(100% - 16px) 100%, 0 100%, 16px 50%)}
+.st-key-step0 button {clip-path: polygon(0 0, calc(100% - 16px) 0, 100% 50%, calc(100% - 16px) 100%, 0 100%)}
+[class*="st-key-step"] button:hover:enabled {background: #d6dde6; color: #16325c}
+[class*="st-key-step"] button[kind="primary"], [class*="st-key-step"] button[data-testid="stBaseButton-primary"],
+[class*="st-key-step"] button[data-testid="stBaseButton-primary"]:hover {background: #2e2e38; color: #ffe600}
+[class*="st-key-step"] button:disabled {background: #f3f5f8; color: #b4bcc8}
+[data-testid="stHorizontalBlock"]:has([class*="st-key-step"]) {gap: 2px}
+.case {font-family: -apple-system, 'Segoe UI', sans-serif; color: #16325c}
+.case h3 {margin: 4px 0 2px} .case .sub {color: #54698d; font-size: 13px; margin-bottom: 8px}
+.tile {border: 1px solid #d8dde6; border-radius: 6px; padding: 12px 14px; background: #fff; height: 100%}
+.tile .big {font-size: 26px; font-weight: 700; color: #16325c} .tile .lbl {font-size: 12.5px; color: #54698d}
+.tile.hero {border-top: 4px solid #ffe600}
 .gap {height: 10px}
 .crm {border: 1px solid #d8dde6; border-radius: 6px; background: #fff; font-family: -apple-system, 'Segoe UI', sans-serif}
 .crm-head {background: #f3f6f9; border-bottom: 1px solid #d8dde6; padding: 12px 18px; border-radius: 6px 6px 0 0}
@@ -246,13 +257,100 @@ def panel(mem, nm):
     <h5>Expert control</h5><ul><li>{esc(sme)}</li></ul></div>"""
 
 
+# ------------------------------------------------------------------------------------------------ the business case
+
+def money(x):
+    return f"-${-x:,.0f}" if x < 0 else f"${x:,.0f}"
+
+
+def tile(big, label, hero=False):
+    return f'<div class="tile{" hero" if hero else ""}"><div class="big">{big}</div><div class="lbl">{label}</div></div>'
+
+
+def business_case(mem):
+    s = mem["s"]
+    st.markdown('<div class="case"><h3>The business case at your firm</h3><div class="sub">Set the assumptions with the '
+                'client; the method is the product brief\'s. Every input is a hypothesis the pilot measures.</div></div>',
+                unsafe_allow_html=True)
+    held = len(s.actions("on hold"))
+    offers = [a for a in s.assignments() if a["work_type"] == "action"]
+    decided = [c for c in s.candidates(MAR) if c["status"] in ("confirmed", "rejected")]
+    caught = held + 1 + 1 + 1  # pitch held, AUM total refused, CRM discrepancy, registration gap
+    st.markdown("**What you just saw, counted**")
+    e = st.columns(4)
+    e[0].markdown(tile(f"{sum(a['status'] == 'acknowledged' for a in offers)} of {len(offers)}",
+                       "follow-ups whose owner went on leave, picked up by a colleague; none lost"), unsafe_allow_html=True)
+    e[1].markdown(tile(str(caught), "wrong things not said: a paused pitch, an AUM total, a CRM state, a credential"),
+                  unsafe_allow_html=True)
+    e[2].markdown(tile(f"{len(decided)} findings", f"approved by an expert, {sum(1 for c in decided if c['escalated_by'])} escalated; "
+                       "each tied to the advisor's words"), unsafe_allow_html=True)
+    e[3].markdown(tile("1 page", "to prepare: uses, said, wants, owed, don't say, each line cited"), unsafe_allow_html=True)
+
+    st.markdown("&nbsp;")
+    a, r = st.columns([1, 1.25], gap="large")
+    with a:
+        st.markdown("**Your firm**")
+        c1, c2, c3 = st.columns(3)
+        rms = c1.number_input("Relationship managers", 1, 2000, 40, step=5)
+        advisors = c2.number_input("Advisors each", 1, 500, 25, step=5)
+        qbrs = c3.number_input("QBRs per advisor / year", 1, 12, 4)
+        st.markdown("**Preparation**")
+        c1, c2, c3 = st.columns(3)
+        today = c1.number_input("Minutes today", 5, 240, 45, step=5)
+        after = c2.number_input("Minutes with it", 1, 240, 15, step=5, help="The vision's 3×: 45 → 15")
+        review = c3.number_input("SME minutes per QBR", 0, 60, 4)
+        rate = st.number_input("Loaded cost per hour ($)", 20, 500, 120, step=10)
+        st.markdown("**Continuity** (measured in the pilot; set the value to 0 to leave it out)")
+        c1, c2, c3 = st.columns(3)
+        lost = c1.number_input("Follow-ups lost today (% of QBRs)", 0.0, 50.0, 8.0, step=1.0)
+        saved = c2.number_input("Of those, recovered (%)", 0.0, 100.0, 75.0, step=5.0)
+        value = c3.number_input("Value of one completed follow-up ($)", 0, 20000, 400, step=100)
+        st.markdown("**Cost**")
+        c1, c2 = st.columns(2)
+        build = c1.number_input("Implementation, year one ($)", 0, 5_000_000, 150_000, step=10_000)
+        run = c2.number_input("Run per year ($)", 0, 2_000_000, 40_000, step=5_000)
+
+    briefs = rms * advisors * qbrs
+    net_minutes = today - after - review
+    hours = briefs * net_minutes / 60
+    capacity = hours * rate
+    continuity = briefs * lost / 100 * saved / 100 * value
+    cost = build + run
+    roi_capacity = (capacity - cost) / cost if cost else 0
+    roi_total = (capacity + continuity - cost) / cost if cost else 0
+    payback = cost / ((capacity + continuity) / 12) if capacity + continuity > 0 else float("inf")
+    breakeven = cost / (net_minutes / 60 * rate) if net_minutes > 0 else float("inf")
+    with r:
+        st.markdown(f"**Result** · {briefs:,} QBR briefs a year")
+        c = st.columns(2)
+        c[0].markdown(tile(f"{hours:,.0f} h", f"relationship-manager time released a year ({net_minutes} min per brief, net of SME review)"),
+                      unsafe_allow_html=True)
+        c[1].markdown(tile(money(capacity), "capacity value a year: time back for clients, not cash saved"), unsafe_allow_html=True)
+        st.markdown("&nbsp;")
+        c = st.columns(2)
+        c[0].markdown(tile(f"{briefs * lost / 100 * saved / 100:,.0f}", "follow-ups a year that no longer fall through the cracks"),
+                      unsafe_allow_html=True)
+        c[1].markdown(tile(money(continuity), "continuity value a year, at your value per follow-up"), unsafe_allow_html=True)
+        st.markdown("&nbsp;")
+        c = st.columns(3)
+        c[0].markdown(tile(f"{roi_total:.0%}", "year-one ROI, capacity and continuity", hero=True), unsafe_allow_html=True)
+        c[1].markdown(tile(f"{roi_capacity:.0%}", "year-one ROI, capacity alone"), unsafe_allow_html=True)
+        c[2].markdown(tile("—" if payback == float("inf") else f"{payback:.1f} mo", "payback"), unsafe_allow_html=True)
+        st.caption(f"Breakeven on capacity alone: {breakeven:,.0f} briefs a year. Year-one cost {money(cost)}. Retained revenue, "
+                   "AUM growth and CLTV are excluded until the pilot can attribute them.")
+        st.markdown("**The pilot, 6–8 weeks:** one team, Salesforce activities and the firm's catalog connected, a baseline of about "
+                    "20 preparations measured before and after, and the six measures: preparation minutes, lost follow-ups, "
+                    "errors caught, SME review load, acceptance of proposed actions, and cost per brief.")
+
+
 # ------------------------------------------------------------------------------------------------ page
 
 st.set_page_config(page_title="Account Intelligence · QBR", layout="wide", initial_sidebar_state="collapsed")
 st.markdown(CSS, unsafe_allow_html=True)
 ss = st.session_state
-if "beat" not in ss:  # deep link: ?beat=2 opens at that beat; ?replay=1 starts with the live toggle off
+if "beat" not in ss:  # deep link: ?beat=2 opens at that step; ?replay=1 starts with the live toggle off
     ss.beat = min(int(st.query_params.get("beat", 0)), len(BEATS) - 1)
+    ss.seen = ss.beat
 
 with st.sidebar:
     st.markdown("**Presenter**")
@@ -266,31 +364,49 @@ with st.sidebar:
 
 nm = names()
 meta, body = parse_interaction(NOTE)
-cols = st.columns([5, 1.2])
-with cols[0]:
-    st.markdown('<div class="beats">' + "  →  ".join(f"<b>{i + 1}. {b}</b>" if i == ss.beat else f"{i + 1}. {b}"
-                                                     for i, b in enumerate(BEATS)) + "</div>", unsafe_allow_html=True)
-with cols[1]:
-    if ss.beat < len(BEATS) - 1 and st.button(f"Next: {BEATS[ss.beat + 1]}", type="primary", width="stretch"):
-        ss.beat += 1
-        st.rerun()
+def go(i):
+    ss.beat = i
+    ss.seen = max(ss.seen, i)
+
+
+# a step unlocks once the work before it has finished: the reading for step 3, the approval for steps 4 and 5
+cap = 1 if "doc" not in ss else 2 if "mem" not in ss else len(BEATS) - 1
+unlocked = min(max(ss.seen, ss.beat) + 1, cap)
+cols = st.columns(len(BEATS))
+for i, (col, name) in enumerate(zip(cols, BEATS)):
+    done = i < ss.beat
+    col.button(("✓ " if done else "") + f"{i + 1}  {name}", key=f"step{i}", on_click=go, args=(i,),
+               type="primary" if i == ss.beat else "secondary", disabled=i > unlocked, width="stretch")
+
+
+# each step's work runs once; going back never repeats it. When it finishes, redraw so the next step unlocks.
+if ss.beat >= 1 and "doc" not in ss:
+    with st.status("Reading the note against Crestline's catalog, intents and sentiments…", expanded=True) as status:
+        try:
+            ss.doc = read_live() if live else read_replay()
+            how = f"Claude ({ss.doc['extractor']}) read it in {ss.doc['seconds']} s" if ss.doc["seconds"] else "Replayed the last live reading"
+            status.update(label=how, state="complete", expanded=False)
+            ss.how = how
+        except Exception as e:  # keep the room moving: fall back to the last reading
+            ss.doc = read_replay()
+            ss.how = f"Live call failed ({type(e).__name__}); replayed the last reading"
+            status.update(label=ss.how, state="error", expanded=False)
+    st.rerun()
+if ss.beat >= 2 and "mem" not in ss:
+    with st.spinner("SME approval, escalation and follow-up…"):
+        ss.mem = build_memory(ss.doc)
+    st.rerun()
+
+
+if ss.beat == len(BEATS) - 1:
+    business_case(ss.mem)
+    st.stop()
 
 query = "CPX Unified Managed Account"
 left, right = st.columns([2.1, 1])
 with left:
-    if ss.beat >= 1 and "doc" not in ss:
-        with st.status("Reading the note against Crestline's catalog, intents and sentiments…", expanded=True) as status:
-            try:
-                ss.doc = read_live() if live else read_replay()
-                how = f"Claude ({ss.doc['extractor']}) read it in {ss.doc['seconds']} s" if ss.doc["seconds"] else "Replayed the last live reading"
-                status.update(label=how, state="complete", expanded=False)
-            except Exception as e:  # keep the room moving: fall back to the last reading
-                ss.doc = read_replay()
-                status.update(label=f"Live call failed ({type(e).__name__}); replayed the last reading", state="error", expanded=False)
-    if ss.beat >= 2 and "mem" not in ss:
-        with st.spinner("SME approval, escalation and follow-up…"):
-            ss.mem = build_memory(ss.doc)
-
+    if ss.beat >= 1 and "how" in ss:
+        st.caption(f"✓ {ss.how}")
     if ss.beat < 3:
         hits = crm_search(query)
         st.markdown(f'<div class="search">CRM search: <span class="q">"{query}"</span> → '
@@ -305,7 +421,7 @@ with left:
                      hide_index=True, width="stretch")
 
     statuses = {}
-    if "mem" in ss:
+    if ss.beat >= 2:
         for c in ss.mem["s"].candidates(MAR):
             statuses[c["id"]] = ("✓ approved, escalated first" if c["escalated_by"] else "✓ approved") if c["status"] == "confirmed" else c["status"]
     if ss.beat == 0:
@@ -329,7 +445,7 @@ with left:
                 st.markdown(f"- {n}")
 
 with right:
-    if "mem" in ss:
+    if ss.beat >= 2:
         st.markdown(panel(ss.mem, nm), unsafe_allow_html=True)
     elif ss.beat == 1:
         st.markdown('<div class="panel"><h4>Waiting for the SME</h4><div class="sub">Nothing enters the firm\'s memory '

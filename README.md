@@ -51,7 +51,15 @@ cd solution
 ../.venv/bin/streamlit run app.py       # opens in the browser; add ?replay=1 to skip the live call, ?beat=N to jump
 ```
 
-The same QBR note, before and after, in four beats the presenter advances: **Today** (the note as the CRM holds it; a CRM search for "CPX Unified Managed Account" finds nothing), **Understand this note** (Claude reads it live against the firm's catalog, intents and sentiments in about 17 seconds; products, intent, sentiment, the open promise and the $320M figure light up, and hovering explains each), **SME approves** (the side panel shows what the firm now knows, what not to say, what is owed and who owns it), and **Ask the firm** (the same search now finds both advisors from approved memory). If the live call fails, it replays the last live reading.
+Five steps, shown as chevrons across the top. A step unlocks once the work before it has finished, and the presenter can click back to any earlier step without repeating work:
+
+1. **Today**: the note as the CRM holds it; a CRM search for "CPX Unified Managed Account" finds nothing.
+2. **Understand this note**: Claude reads it live against the firm's catalog, intents and sentiments (about 17 seconds); products, intent, sentiment, the open promise and the $320M figure light up, and hovering explains each.
+3. **SME approves**: the side panel shows what the firm now knows, what not to say, what is owed and who owns it.
+4. **Ask the firm**: the same search now finds both advisors from approved memory.
+5. **The business case**: what the walkthrough showed, counted, and an ROI built from editable assumptions about the client's firm (team size, preparation minutes, SME review, continuity, cost), using the product brief's method.
+
+If the live call fails, it replays the last live reading.
 
 ### With Claude
 
